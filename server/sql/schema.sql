@@ -1,12 +1,6 @@
-
 -- 
 -- MirrorBrain Database scheme for PostgreSQL
 -- 
-
--- before PL/pgSQL functions can be used, the languages needs to be "installed"
--- in the database. This is done with:
--- 
--- createlang plpgsql <dbname>
 
 -- --------------------------------------------------------
 BEGIN;
@@ -27,7 +21,7 @@ CREATE TABLE "version" (
 CREATE TABLE "filearr" (
         "id" serial NOT NULL PRIMARY KEY,
         "path" varchar(512) UNIQUE NOT NULL,
-        "mirrors" smallint[]
+    "mirrors" smallint[]
 );
 
 -- --------------------------------------------------------
