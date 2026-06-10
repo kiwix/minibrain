@@ -1,4 +1,4 @@
-# pyright: strict, reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false
+# pyright: strict, reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false, reportUntypedFunctionDecorator=false
 import datetime
 import urllib.parse
 from collections.abc import Generator
@@ -39,6 +39,7 @@ def get_listing(
     )
 
 
+@database.atomic("SERIALIZABLE")
 def mirr_add_bypath(serverid: int, path: str) -> int:
     """file ID of matching file after added/updating/skipping mirror in mirrors col"""
     cursor = database.execute_sql("SELECT mirr_add_bypath(%s, %s);", (serverid, path))
@@ -48,10 +49,10 @@ def mirr_add_bypath(serverid: int, path: str) -> int:
     # on each mirror (ie: trust only our own files from hashes)
     return next(cursor)[0]
 
-
+@database.atomic("SERIALIZABLE")
 def mirr_del_byid(serverid: int, file_id: int) -> bool:
     """whether serverid was removed from this file's mirrors column"""
-    cursor = database.execute_sql("SELECT mirr_del_byid(%d, %d);", (serverid, file_id))
+    cursor = database.execute_sql("SELECT mirr_del_byid(%s, %s);", (serverid, file_id))
     return next(cursor) == 1
 
 
@@ -112,35 +113,37 @@ def run_mirror_scan(
     scanned_files.sort()
     logger.info(f"FOUND {nb_scanned} files on {mirror_ident}")
 
-    with database.atomic():
-        for path in scanned_files:
-            if dry_run:
-                file_id = get_fileid(path)
-            else:
-                # add mirror ID to file's mirrors column (failsafe function)
-                file_id = mirr_add_bypath(mirror_id, path)
-
-            # remove from list of files on mirror (we've seen it)
-            if file_id:  # in case it's a non-mirrored file
-                files_in_db.remove(file_id)
-
-        # now files_in_db is composed exclusively of files that we once
-        # recorded as present in mirror but are not present anymore
-        nb_purged = len(files_in_db)
+    for path in scanned_files:
         if dry_run:
-            logger.info(f"WOULD PURGE {nb_purged} files previously on {mirror_ident}")
-            return ScanResult(
-                nb_scanned=nb_scanned, nb_purged=nb_purged, files_per_mn=files_per_mn
-            )
+            file_id = get_fileid(path)
+        else:
+            # add mirror ID to file's mirrors column (failsafe function)
+            file_id = mirr_add_bypath(mirror_id, path)
 
-        logger.info(f"PURGING {nb_purged} files previously on {mirror_ident}")
+        # remove from list of files on mirror (we've seen it)
+        if file_id:  # in case it's a non-mirrored file
+            try:
+                files_in_db.remove(file_id)
+            except ValueError:
+                ...  # might not have been there (that's the point)
 
-        for file_id in files_in_db:
-            mirr_del_byid(serverid=mirror_id, file_id=file_id)
-
+    # now files_in_db is composed exclusively of files that we once
+    # recorded as present in mirror but are not present anymore
+    nb_purged = len(files_in_db)
+    if dry_run:
+        logger.info(f"WOULD PURGE {nb_purged} files previously on {mirror_ident}")
         return ScanResult(
             nb_scanned=nb_scanned, nb_purged=nb_purged, files_per_mn=files_per_mn
         )
+
+    logger.info(f"PURGING {nb_purged} files previously on {mirror_ident}")
+
+    for file_id in files_in_db:
+        mirr_del_byid(serverid=mirror_id, file_id=file_id)
+
+    return ScanResult(
+        nb_scanned=nb_scanned, nb_purged=nb_purged, files_per_mn=files_per_mn
+    )
 
 
 def mirrorscan(
@@ -178,6 +181,13 @@ def mirrorscan(
     if not mirror.status_baseurl:
         logger.critical(f"Server `{mirror_id}` is offline ; not scanning")
         return 2
+
+    # scan is not performed in an atomic fashion
+    # scan is considered fragile and can thus fail in-course but it is beneficial
+    # to record the partial update.
+    # ADD-MIRROR and DEL-MIRROR operates in the filearr row and the very cell
+    # being updated is the same for other mirrors.
+    # Thus those two operations use a SERIALIZABLE isolation, holding a lock
 
     scan = run_mirror_scan(
         mirror_id=mirror.id,
