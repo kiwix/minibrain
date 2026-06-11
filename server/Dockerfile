@@ -78,4 +78,4 @@ RUN \
   && apxs -cia mod_autoindex_mb.c \
   && true
 
-CMD ["/usr/bin/httpd-foreground", "-DUseMaxMind"]
+CMD ["/usr/local/bin/httpd-foreground", "-DUseMaxMind"]
