@@ -13,6 +13,7 @@ dependencies = [
     "requests==2.34.2",
     "werkzeug==3.1.8",
     "humanfriendly==10.0",
+    "rich==15.0.0",
     "types-peewee==4.0.5.20260518",
     "types-humanfriendly==10.0.1.20250319",
 ]

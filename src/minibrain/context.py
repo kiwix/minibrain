@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, get_origin
 
+from rich.logging import RichHandler
+
 DEFAULT_CONFIG_PATH = os.getenv("MIRRORBRAIN_CONFIG_FILE", "/etc/mirrorbrain.conf")
 DEFAULT_INCIDENTS_FOLDER: Path = (
     Path(os.getenv("INCIDENTS_FOLDER", "incidents")).expanduser().resolve()
@@ -89,9 +91,10 @@ class Context:
         else:
             cls.logger.setLevel(logging.DEBUG if debug else logging.INFO)
         logging.basicConfig(
-            level=logging.DEBUG if debug else logging.INFO,
-            format="%(levelname)-8s | %(message)s",
-            datefmt="%(asctime)s ",
+            level=logging.DEBUG if debug else "INFO",
+            format="%(message)s",
+            datefmt="[%X]",
+            handlers=[RichHandler()],
         )
 
     @classmethod
