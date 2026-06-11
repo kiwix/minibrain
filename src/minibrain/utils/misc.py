@@ -7,7 +7,9 @@ def format_size(size: int) -> str:
     return f"{size!s} ({humanfriendly.format_size(size, True)})"
 
 
+def format_dt(dt: datetime.datetime) -> str:
+    return dt.strftime("%Y-%m-%d @ %H:%M:%S")
+
+
 def format_ts(ts: int) -> str:
-    return datetime.datetime.fromtimestamp(ts, tz=datetime.UTC).strftime(
-        "%Y-%m-%d@%H:%M:%S"
-    )
+    return format_dt(datetime.datetime.fromtimestamp(ts, tz=datetime.UTC))

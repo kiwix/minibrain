@@ -48,6 +48,7 @@ dev = [
 [project.scripts]
 probe = "minibrain.entrypoints.probe:entrypoint"
 scan = "minibrain.entrypoints.scan:entrypoint"
+status = "minibrain.entrypoints.status:entrypoint"
 copydb = "minibrain.entrypoints.copydb:entrypoint"
 
 [tool.hatch.version]
