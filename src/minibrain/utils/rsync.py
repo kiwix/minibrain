@@ -29,7 +29,7 @@ def get_rsync_listing(
         # "--delete",
         "--ignore-errors",
         "--dry-run",
-        "--out-format=%B %l %M %n",
+        "--out-format=%B %l %M %n%L",
         "--contimeout",
         str(timeout),
     ]
@@ -49,7 +49,23 @@ def get_rsync_listing(
 
     for line in rsync.stdout.splitlines():
         perms, size_s, mtime_s, path = line.rsplit(" ", 3)
+
+        if "->" in path:  # symlink
+            path, symlink = path.split(" -> ", 1)
+        elif "=>" in path:  # hardlink
+            path, _ = path.split(" => ", 1)
+            symlink = ""
+        else:
+            symlink = ""
         perms = perms.strip()
+        # file perms only
+        if len(perms) <= 9:  # noqa: PLR2004
+            ft = "-"
+            if path.endswith("/"):
+                ft = "d"
+            elif symlink:
+                ft = "l"
+            perms = f"{ft}{perms}"
         mode = perms_to_mode(perms)
 
         desc = f"{perms} {format_size(int(size_s))} {mtime_s} {path}"
