@@ -35,7 +35,7 @@ def mirrorprobe(
     except DoesNotExist:
         logger.critical(f"Server `{mirror_id}` was not found in DB")
         return 1
-    if not mirror.enabled:
+    if not mirror.enabled and not enable_revived and not dry_run:
         logger.critical(f"Server `{mirror_id}` is not enabled.")
         return 1
 
