@@ -113,7 +113,7 @@ def main() -> int:
             return mirrorscan(
                 mirror_id=args.mirror,
                 dry_run=False,
-                only_scan=True,
+                only_scan=False,
                 trusted_mirror=args.trusted_mirror,
                 enable=False,
             )
