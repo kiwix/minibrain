@@ -72,7 +72,7 @@ def mirrorprobe(
         if not dry_run:
             send_probe_status_change_alert(probe=probe, alerts=alerts)
             logger.info(
-                f"setting status_baseurl=0 for {mirror.identifier} (id={mirror.id})"
+                f"setting status_baseurl=1 for {mirror.identifier} (id={mirror.id})"
             )
             mirror.statusBaseurl = True
             if enable_revived:
