@@ -270,7 +270,7 @@ def run(context: Context) -> int:
                     "VALUES (%s, %s, %s, %b, %b, %b, %b, %b, %b, '', 0, '', '');",
                     (new_file_id, *thishash_row),
                 )
-            next(progress)
+            next(progress.__iter__())
 
     return 0
 
