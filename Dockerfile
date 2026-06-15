@@ -25,6 +25,7 @@ COPY src /src/src
 COPY *.md /src/
 COPY server/conf/mirrorbrain.conf /etc/mirrorbrain.conf
 COPY motd /etc/motd
+COPY entrypoint.sh /usr/local/bin/entrypoint
 
 # Install + cleanup
 RUN \
@@ -35,5 +36,5 @@ export PATH=\"/usr/local/mbenv/bin:${PATH}\"\n\
 /bin/cat /etc/motd\n\
 " >> /etc/profile
 
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/entrypoint" ]
 CMD ["/bin/sh"]
