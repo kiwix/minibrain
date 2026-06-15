@@ -2,7 +2,7 @@
 from peewee import DoesNotExist
 
 from minibrain.context import Context
-from minibrain.db import Server, database
+from minibrain.db import Server
 from minibrain.utils.alerts import AlertDestination, send_probe_status_change_alert
 from minibrain.utils.db import get_mb_version
 from minibrain.utils.probe import probe_mirror
@@ -63,7 +63,7 @@ def mirrorprobe(
             logger.info(
                 f"setting status_baseurl=0 for {mirror.identifier} (id={mirror.id})"
             )
-            mirror.statusBaseurl = False
+            mirror.status_baseurl = False
             mirror.save()
 
     # came back online!
@@ -74,12 +74,10 @@ def mirrorprobe(
             logger.info(
                 f"setting status_baseurl=1 for {mirror.identifier} (id={mirror.id})"
             )
-            mirror.statusBaseurl = True
+            mirror.status_baseurl = True
             if enable_revived:
                 logger.info(f"re-enabling {mirror.identifier}")
                 mirror.enabled = True
             mirror.save()
-
-    database.close()
 
     return 0
