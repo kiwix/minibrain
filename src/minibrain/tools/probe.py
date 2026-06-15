@@ -54,7 +54,7 @@ def mirrorprobe(
             mirror.save()
 
     # just failed!
-    elif mirror.status_baseurl and not probe.succeeded:
+    elif not mirror.status_baseurl and not probe.succeeded:
         logger.info(
             f"FAIL: {probe!s}" % (mirror.identifier, mirror.baseurl, mirror.response)
         )
