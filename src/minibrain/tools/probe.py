@@ -54,7 +54,7 @@ def mirrorprobe(
             mirror.save()
 
     # just failed!
-    elif not mirror.status_baseurl and not probe.succeeded:
+    elif mirror.status_baseurl and not probe.succeeded:
         logger.info(
             f"FAIL: {probe!s}" % (mirror.identifier, mirror.baseurl, mirror.response)
         )
@@ -67,7 +67,7 @@ def mirrorprobe(
             mirror.save()
 
     # came back online!
-    elif mirror.status_baseurl and probe.succeeded:
+    elif not mirror.status_baseurl and probe.succeeded:
         logger.info(f"REVIVED: {mirror.identifier}")
         if not dry_run:
             send_probe_status_change_alert(probe=probe, alerts=alerts)
