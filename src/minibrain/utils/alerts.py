@@ -143,7 +143,7 @@ def send_slack_mirror_status_change(target: str, probe: ProbeResponse):
             timeout=context.slack_timeout,
             json={
                 "channel": f"{target}",
-                "username": "Mirrorbrain Probe",
+                "username": "Minibrain Probe",
                 "icon_url": "https://get.kiwix.org/favicon-96x96.png",
                 "attachments": [
                     {

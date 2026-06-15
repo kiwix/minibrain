@@ -12,6 +12,14 @@ DEFAULT_CONFIG_PATH = os.getenv("MIRRORBRAIN_CONFIG_FILE", "/etc/mirrorbrain.con
 DEFAULT_INCIDENTS_FOLDER: Path = (
     Path(os.getenv("INCIDENTS_FOLDER", "incidents")).expanduser().resolve()
 )
+DEFAULT_MAIL_FROM: str = os.getenv("MAIL_FROM", "")
+DEFAULT_MAILGUN_API_URL: str = os.getenv("MAILGUN_API_URL", "")
+DEFAULT_MAILGUN_API_KEY: str = os.getenv("MAILGUN_API_KEY", "")
+DEFAULT_SLACK_URL: str = os.getenv("SLACK_URL", "")
+DEFAULT_SLACK_TIMEOUT: int = int(os.getenv("SLACK_TIMEOUT", "10"))
+DEFAULT_HTTP_SCAN_TIMEOUT: int = int(os.getenv("HTTP_SCAN_TIMEOUT", "20"))
+DEFAULT_RSYNC_SCAN_TIMEOUT: int = int(os.getenv("RSYNC_SCAN_TIMEOUT", "20"))
+DEFAULT_ALERTS: list[str] = os.getenv("ALERTS", "").split(",")
 
 
 @dataclass(kw_only=True)
@@ -42,16 +50,16 @@ class AlertDestination:
 @dataclass
 class Context:
     _instance: Context | None = None
-    mail_from: str = os.getenv("MAIL_FROM", "")
-    mailgun_api_url: str = os.getenv("MAILGUN_API_URL", "")
-    mailgun_api_key: str = os.getenv("MAILGUN_API_KEY", "")
-    slack_url: str = os.getenv("SLACK_URL", "")
-    slack_timeout: int = int(os.getenv("SLACK_TIMEOUT", "10"))
+    mail_from: str = DEFAULT_MAIL_FROM
+    mailgun_api_url: str = DEFAULT_MAILGUN_API_URL
+    mailgun_api_key: str = DEFAULT_MAILGUN_API_KEY
+    slack_url: str = DEFAULT_SLACK_URL
+    slack_timeout: int = DEFAULT_SLACK_TIMEOUT
     incidents_folder: Path = DEFAULT_INCIDENTS_FOLDER
 
     # timeouts in seconds
-    http_scan_timeout: int = int(os.getenv("HTTP_SCAN_TIMEOUT", "20"))
-    rsync_scan_timeout: int = int(os.getenv("RSYNC_SCAN_TIMEOUT", "20"))
+    http_scan_timeout: int = DEFAULT_HTTP_SCAN_TIMEOUT
+    rsync_scan_timeout: int = DEFAULT_RSYNC_SCAN_TIMEOUT
 
     debug: bool = False
 

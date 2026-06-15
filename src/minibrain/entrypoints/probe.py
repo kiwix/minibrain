@@ -6,6 +6,7 @@ from types import FrameType
 
 from minibrain.__about__ import __version__
 from minibrain.context import (
+    DEFAULT_ALERTS,
     DEFAULT_CONFIG_PATH,
     AlertDestination,
     Context,
@@ -44,6 +45,7 @@ def prepare_context(raw_args: list[str]) -> argparse.Namespace:
         ),
         action="append",
         dest="alerts",
+        default=DEFAULT_ALERTS,
     )
 
     parser.add_argument(
