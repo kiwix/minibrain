@@ -10,4 +10,5 @@ Available tools:
 $ status            quick overview of mirror statuses
 $ probe             check if a mirror is online or not
 $ scan              scan a mirror's filetree to update DB with list of files on mirror
-  
+$ probe-then-scan   probe then scan if alive (shortcut for prod jobs)
+
