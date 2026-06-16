@@ -1,4 +1,6 @@
+import os
 import stat
+from pathlib import Path
 
 
 def perms_to_mode(perms: str) -> int:
@@ -66,3 +68,21 @@ def get_normalized_path(path: str) -> str:
         path = path[1:]
     # remove double slashes
     return path.replace("//", "/")
+
+
+def create_sparse(fpath: Path, size: int, mtime: float):
+    """creates a sparse file of provided size and mtime"""
+    # only write a single byte at end of file.
+    # supported by most modern filesystems
+    with open(fpath, "wb") as fp:
+        if size == 0:
+            fp.truncate()
+            return
+        fp.seek(size - 1)
+        fp.write(b"\0")
+    os.utime(fpath, times=(mtime, mtime))
+
+
+def resolve_path(text: str) -> Path:
+    """resolved path"""
+    return Path(text).expanduser().resolve()

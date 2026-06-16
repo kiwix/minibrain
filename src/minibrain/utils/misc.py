@@ -14,7 +14,7 @@ def format_dt(dt: datetime.datetime) -> str:
     return dt.strftime("%Y-%m-%d @ %H:%M:%S")  # noqa: RUF001
 
 
-def format_ts(ts: int) -> str:
+def format_ts(ts: int | float) -> str:
     return format_dt(datetime.datetime.fromtimestamp(ts, tz=datetime.UTC))
 
 

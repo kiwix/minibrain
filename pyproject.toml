@@ -9,13 +9,14 @@ description = "Simple tools to maintain Kiwix load-balancer"
 readme = "README.md"
 dependencies = [
     "psycopg[binary]==3.3.4",
-    "peewee==4.0.7",
+    "peewee==4.1.0",
     "requests==2.34.2",
     "werkzeug==3.1.8",
     "humanfriendly==10.0",
     "rich==15.0.0",
     "types-peewee==4.0.5.20260518",
     "types-humanfriendly==10.0.1.20250319",
+    "filelock==3.29.4"
 ]
 dynamic = ["authors", "classifiers", "keywords", "license", "version", "urls"]
 
@@ -48,6 +49,8 @@ dev = [
 probe = "minibrain.entrypoints.probe:entrypoint"
 scan = "minibrain.entrypoints.scan:entrypoint"
 probe-then-scan = "minibrain.entrypoints.probe_then_scan:entrypoint"
+makehashes = "minibrain.entrypoints.makehashes:entrypoint"
+pull-hashestree = "minibrain.entrypoints.pull_hashestree:entrypoint"
 status = "minibrain.entrypoints.status:entrypoint"
 copydb = "minibrain.entrypoints.copydb:entrypoint"
 

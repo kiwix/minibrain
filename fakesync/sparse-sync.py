@@ -163,7 +163,7 @@ def main() -> int:
 
         return sync_tree(
             remote_source=args.remote_source,
-            local_dest=args.local_dest,
+            local_dest=args.local_dest.expanduser().resolve(),
             excludes=args.excludes,
             dry_run=args.dry_run,
             debug=args.debug,
@@ -176,7 +176,7 @@ def main() -> int:
 
 
 def create_sparse(fpath: Path, size: int):
-    """ creates a sparse file of provided size"""
+    """creates a sparse file of provided size"""
     # only write a single byte at end of file.
     # supported by most modern filesystems
     with open(fpath, "wb") as fp:
