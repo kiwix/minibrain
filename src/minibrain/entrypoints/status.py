@@ -1,14 +1,10 @@
 import argparse
-import signal
 import sys
 from pathlib import Path
-from types import FrameType
 
 from minibrain.__about__ import __version__
-from minibrain.context import (
-    DEFAULT_CONFIG_PATH,
-    Context,
-)
+from minibrain.context import DEFAULT_CONFIG_PATH, Context
+from minibrain.utils.misc import register_exit_signals
 
 logger = Context.logger
 
@@ -33,16 +29,6 @@ def prepare_context(raw_args: list[str]) -> argparse.Namespace:
         help="Config file to use",
         dest="instance_name",
         default="",
-    )
-
-    parser.add_argument(
-        "--alert",
-        help=(
-            "Comma-separated list of alert `proto:address` destination. "
-            "Only `slack` and `email` proto supported"
-        ),
-        action="append",
-        dest="alerts",
     )
 
     parser.add_argument(
@@ -72,18 +58,10 @@ def main() -> int:
         prepare_context(sys.argv[1:])
         context = Context.get()
         debug = context.debug
+        register_exit_signals()
 
         from minibrain.db import database  # noqa: PLC0415
         from minibrain.tools.status import mbstatus  # noqa: PLC0415
-
-        def exit_gracefully(signum: int, frame: FrameType | None):  # noqa: ARG001
-            print("\n", flush=True)  # noqa: T201
-            logger.info(f"Received {signal.Signals(signum).name}/{signum}. Exiting")
-            sys.exit(4)
-
-        signal.signal(signal.SIGTERM, exit_gracefully)
-        signal.signal(signal.SIGINT, exit_gracefully)
-        signal.signal(signal.SIGQUIT, exit_gracefully)
 
         try:
             database.connect()
