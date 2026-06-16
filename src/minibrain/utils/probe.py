@@ -5,7 +5,6 @@ from http import HTTPStatus
 import requests
 
 USER_AGENT = "Minibrain Probe (see https://lb.download.kiwix.org/probe_info)"
-TIMEOUT = 10
 
 
 @dataclass
@@ -30,7 +29,7 @@ class ProbeResponse:
         return f"{self.mirror} ({self.url}): {self.response}"
 
 
-def probe_mirror(mirror: str, base_url: str) -> ProbeResponse:
+def probe_mirror(mirror: str, base_url: str, timeout: int = 5) -> ProbeResponse:
     now = datetime.datetime.now(tz=datetime.UTC)
     try:
         resp = requests.get(
@@ -38,7 +37,7 @@ def probe_mirror(mirror: str, base_url: str) -> ProbeResponse:
             headers={"Accept": "*/*", "User-Agent": USER_AGENT},
             stream=True,
             allow_redirects=True,
-            timeout=TIMEOUT,
+            timeout=timeout,
         )
     except Exception as exc:
         return ProbeResponse(on=now, mirror=mirror, url=base_url, error=str(exc))

@@ -17,6 +17,7 @@ DEFAULT_MAILGUN_API_URL: str = os.getenv("MAILGUN_API_URL", "")
 DEFAULT_MAILGUN_API_KEY: str = os.getenv("MAILGUN_API_KEY", "")
 DEFAULT_SLACK_URL: str = os.getenv("SLACK_URL", "")
 DEFAULT_SLACK_TIMEOUT: int = int(os.getenv("SLACK_TIMEOUT", "10"))
+DEFAULT_HTTP_PROBE_TIMEOUT: int = int(os.getenv("HTTP_PROBE_TIMEOUT", "10"))
 DEFAULT_HTTP_SCAN_TIMEOUT: int = int(os.getenv("HTTP_SCAN_TIMEOUT", "20"))
 DEFAULT_RSYNC_SCAN_TIMEOUT: int = int(os.getenv("RSYNC_SCAN_TIMEOUT", "20"))
 DEFAULT_ALERTS: list[str] = os.getenv("ALERTS", "").split(",")
@@ -58,6 +59,7 @@ class Context:
     incidents_folder: Path = DEFAULT_INCIDENTS_FOLDER
 
     # timeouts in seconds
+    http_probe_timeout: int = DEFAULT_HTTP_PROBE_TIMEOUT
     http_scan_timeout: int = DEFAULT_HTTP_SCAN_TIMEOUT
     rsync_scan_timeout: int = DEFAULT_RSYNC_SCAN_TIMEOUT
 
