@@ -39,7 +39,9 @@ def mirrorprobe(
         logger.critical(f"Server `{mirror_id}` is not enabled.")
         return 1
 
-    probe = probe_mirror(mirror=mirror.identifier, base_url=mirror.baseurl, timeout=context.probe_timeout)
+    probe = probe_mirror(
+        mirror=mirror.identifier, base_url=mirror.baseurl, timeout=context.http_probe_timeout
+    )
 
     # still failing
     if not mirror.status_baseurl and not probe.succeeded:
