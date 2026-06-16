@@ -55,9 +55,7 @@ def mirrorprobe(
 
     # just failed!
     elif mirror.status_baseurl and not probe.succeeded:
-        logger.info(
-            f"FAIL: {probe!s}" % (mirror.identifier, mirror.baseurl, mirror.response)
-        )
+        logger.info(f"FAIL: {probe!s}")
         if not dry_run:
             send_probe_status_change_alert(probe=probe, alerts=alerts)
             logger.info(

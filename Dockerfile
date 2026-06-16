@@ -36,5 +36,5 @@ export PATH=\"/usr/local/mbenv/bin:${PATH}\"\n\
 /bin/cat /etc/motd\n\
 " >> /etc/profile
 
-ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/entrypoint" ]
+ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/entrypoint"]
 CMD ["/bin/sh"]
