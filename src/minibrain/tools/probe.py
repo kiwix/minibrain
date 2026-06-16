@@ -40,7 +40,9 @@ def mirrorprobe(
         return 1
 
     probe = probe_mirror(
-        mirror=mirror.identifier, base_url=mirror.baseurl, timeout=context.http_probe_timeout
+        mirror=mirror.identifier,
+        base_url=mirror.baseurl,
+        timeout=context.http_probe_timeout,
     )
 
     # still failing
