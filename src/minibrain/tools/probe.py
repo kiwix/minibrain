@@ -48,6 +48,8 @@ def mirrorprobe(
     # still failing
     if not mirror.status_baseurl and not probe.succeeded:
         logger.info(f"still dead: {probe!s}")
+        # we want to inform caller that probe is still failing
+        return 2
 
     # still alive
     elif mirror.status_baseurl and probe.succeeded:
@@ -67,6 +69,8 @@ def mirrorprobe(
             )
             mirror.status_baseurl = False
             mirror.save()
+        # we want to inform caller that probe failed
+        return 3
 
     # came back online!
     elif not mirror.status_baseurl and probe.succeeded:
