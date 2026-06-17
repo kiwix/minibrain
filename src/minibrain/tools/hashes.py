@@ -168,7 +168,7 @@ def record_hashes_in_db(
         if not file_id:
             file_id = get_single_int(
                 db,
-                "INSERT INTO filearr (path) VALUES (%s, %s) RETURNING id;",
+                "INSERT INTO filearr (path) VALUES (%s) RETURNING id;",
                 (path,),
             )
 
