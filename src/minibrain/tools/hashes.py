@@ -22,7 +22,11 @@ logging.getLogger("filelock").setLevel(logging.INFO)
 
 
 def get_single_int(db: PostgresqlDatabase, query: str, args: tuple[str | int]) -> int:
-    return get_single(db, query, args)  # pyright:  ignore
+    try:
+        return get_single(db, query, args)  # pyright:  ignore
+    # no record returned
+    except StopIteration:
+        return 0
 
 
 def get_single(
