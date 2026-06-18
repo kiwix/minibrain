@@ -1,9 +1,9 @@
 import binascii
+import datetime
 import hashlib
 import logging
 import re
 import shutil
-from dataclasses import dataclass, field
 from pathlib import Path
 
 import psycopg
@@ -77,32 +77,76 @@ def get_target_files(target_path: Path) -> set[Path]:
     }
 
 
-@dataclass(kw_only=True)
 class HashBag:
-    md5: bytes = b""
+    def __init__(self, fpath: Path, filesize: int, chunk_size: int) -> None:
+        self.fpath = fpath
+        self.filesize = filesize
 
-    sha1: bytes = b""
-    sha1_piecesize: int = 0
-    sha1_pieces: list[bytes] = field(default_factory=list[bytes])
+        self.md5: bytes = b""
 
-    sha256: bytes = b""
-    btih: bytes = b""
+        self.sha1: bytes = b""
+        self.sha1_piecesize: int = chunk_size
+        self.sha1_pieces: list[bytes] = []
 
-    def compute_btih(self, filename: str, filesize: int):
+        self.sha256: bytes = b""
+        self.btih: bytes = b""
+
+        self.duration: int = 0
+
+    @property
+    def computed(self) -> bool:
+        return bool(self.duration)
+
+    @property
+    def speed(self) -> int:
+        """computation speed (in bps)"""
+        return self.filesize // self.duration
+
+    def compute(self):
+        md5_digest = hashlib.new("md5", usedforsecurity=False)
+        sha1_digest = hashlib.new("sha1", usedforsecurity=False)
+        sha256_digest = hashlib.new("sha256", usedforsecurity=False)
+
+        started_on = datetime.datetime.now(tz=datetime.UTC)
+
+        with open(self.fpath, "rb") as fp:
+            while True:
+                buf = fp.read(self.sha1_piecesize)
+                if not buf or len(buf) != self.sha1_piecesize:
+                    break
+
+                md5_digest.update(buf)
+                sha1_digest.update(buf)
+                sha256_digest.update(buf)
+
+                self.sha1_pieces.append(
+                    hashlib.sha1(buf, usedforsecurity=False).digest()
+                )
+
+        self.md5 = md5_digest.digest()
+        self.sha1 = sha1_digest.digest()
+        self.sha256 = sha256_digest.digest()
+        self.btih = self.get_btih()
+        self.duration = (
+            int((datetime.datetime.now(tz=datetime.UTC) - started_on).total_seconds())
+            or 1
+        )
+
+    def get_btih(self) -> bytes:
         parts: list[bytes] = [
             b"d",
             b"6:length",
             b"i",
-            str(filesize).encode("ASCII"),
+            str(self.filesize).encode("ASCII"),
             b"e",
             b"6:md5sum",
             str(len(self.md5) * 2).encode("ASCII"),
             b":",
             binascii.hexlify(self.md5),
             b"4:name",
-            str(len(filename)).encode("ASCII"),
+            str(len(self.fpath.name)).encode("ASCII"),
             b":",
-            filename.encode("UTF-8"),
+            self.fpath.name.encode("UTF-8"),
             b"12:piece length",
             b"i",
             str(self.sha1_piecesize).encode("ASCII"),
@@ -121,37 +165,17 @@ class HashBag:
             self.sha256,
             b"e",
         ]
-        self.btih = hashlib.sha1(b"".join(parts), usedforsecurity=False).digest()
+        return hashlib.sha1(b"".join(parts), usedforsecurity=False).digest()
 
 
 def compute_hashes(fpath: Path, filesize: int | None = None) -> HashBag:
     """Collection of hashes for a file"""
-    chunk_size: int = 4096
-    md5_digest = hashlib.new("md5", usedforsecurity=False)
-    sha1_digest = hashlib.new("sha1", usedforsecurity=False)
-    sha256_digest = hashlib.new("sha256", usedforsecurity=False)
-    bag = HashBag(sha1_piecesize=chunk_size)
-
-    with open(fpath, "rb") as fp:
-        while True:
-            buf = fp.read(chunk_size)
-            if not buf or len(buf) != chunk_size:
-                break
-
-            md5_digest.update(buf)
-            sha1_digest.update(buf)
-            sha256_digest.update(buf)
-
-            bag.sha1_pieces.append(hashlib.sha1(buf, usedforsecurity=False).digest())
-
-    bag.md5 = md5_digest.digest()
-    bag.sha1 = sha1_digest.digest()
-    bag.sha256 = sha256_digest.digest()
-    bag.compute_btih(
-        filename=fpath.name,
+    bag = HashBag(
+        fpath=fpath,
         filesize=filesize if filesize is not None else fpath.stat().st_size,
+        chunk_size=context.mb_chunk_size,
     )
-
+    bag.compute()
     return bag
 
 
