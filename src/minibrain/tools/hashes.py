@@ -193,8 +193,7 @@ def record_hashes_in_db(
         )
 
         if not hash_exists:
-            get_single_int(
-                db,  # pyright: ignore
+            db.execute_sql(  # pyright: ignore[reportUnknownMemberType]
                 "INSERT INTO hash "
                 "(file_id, mtime, size, md5,"
                 " sha1, sha256, sha1piecesize, sha1pieces, btih,"
@@ -203,8 +202,7 @@ def record_hashes_in_db(
                 (file_id, *hash_payload),  # pyright: ignore
             )
         else:
-            get_single_int(
-                db,  # pyright: ignore
+            db.execute_sql(  # pyright: ignore[reportUnknownMemberType]
                 "UPDATE hash SET "
                 "mtime = %s, , size = %s, md5 = %b, sha1 = %b, sha256 = %b, "
                 "sha1piecesize = %s, sha1pieces = %b, btih = %b, "
