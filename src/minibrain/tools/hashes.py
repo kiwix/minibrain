@@ -270,13 +270,18 @@ def makehashes(
     logger.info(f"Target contains {len(target_files):,} files")
 
     # remove from target fs if not in source
+    removed_targets = 0
     for target_file in target_files:
         source_file = base_path.joinpath(target_file.relative_to(target_path))
         if not source_file.exists():
             logger.debug(f"Removing hash-file {target_file}: not in source anymore")
             if not dry_run:
                 target_file.unlink()
-    logger.info(f"Target now contains {len(target_files):,} files after cleanup")
+            removed_targets += 1
+
+    logger.info(
+        f"[{dry_run=}] Removed {removed_targets:,} target files"
+    )
 
     # stat() source and target and remove matching from list
     for source_file in set(source_files):
@@ -288,7 +293,7 @@ def makehashes(
 
         elif target_file.is_dir():
             # a previous folder is now a new file, we need to remove it
-            logger.debug(f"Removing dir {target_file} in hash-tree: it's a file now")
+            logger.debug(f"[{dry_run=}] Removing dir {target_file} in hash-tree: it's a file now")
             if not dry_run:
                 shutil.rmtree(target_file)
             continue
@@ -321,17 +326,17 @@ def makehashes(
 
         lock_file = target_file.with_suffix(f"{target_file.suffix}.lock")
         if lock_file.exists():
-            logger.debug("Skipping {source_file} as there's a lock on disk")
+            logger.debug("> Skipping, as there's a lock on disk")
             continue
 
         with FileLock(lock_file, timeout=0):
             logger.debug(f"Computing hashes for {source_file}")
             bag = compute_hashes(fpath=source_file, filesize=source_info.st_size)
             logger.debug(
-                f"> {format_timespan(bag.duration)} at {format_size(bag.speed)}/s"
+                f">> {format_timespan(bag.duration)} at {format_size(bag.speed)}/s"
             )
 
-            logger.debug(f"Recording hashes in DB for {relpath}")
+            logger.debug("> [{dry_run=}] Recording hashes in DB")
             if not dry_run:
                 record_hashes_in_db(
                     db=database,
@@ -341,7 +346,7 @@ def makehashes(
                     bag=bag,
                 )
 
-            logger.debug(f"Creating sparse {target_file}")
+            logger.debug(f"> [{dry_run=}] Creating sparse {target_file}")
             if not dry_run:
                 create_sparse(
                     fpath=target_file,
