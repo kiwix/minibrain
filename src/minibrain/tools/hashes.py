@@ -198,8 +198,7 @@ def record_hashes_in_db(
                 "(file_id, mtime, size, md5,"
                 " sha1, sha256, sha1piecesize, sha1pieces, btih,"
                 " pgp, zblocksize, zhashlens, zsums) "
-                "VALUES (%s, %s, %s, %b, %b, %b, %s, %b, %b, %s, %s, %s, %b) "
-                "RETURNING id;",
+                "VALUES (%s, %s, %s, %b, %b, %b, %s, %b, %b, %s, %s, %s, %b);",
                 (file_id, *hash_payload),  # pyright: ignore
             )
         else:
