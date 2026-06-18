@@ -55,6 +55,14 @@ def prepare_context(raw_args: list[str]) -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "--fail-on-scan",
+        help="Dont fail process on probe failures, only scan ones",
+        action="store_true",
+        dest="fail_on_scan",
+        default=False,
+    )
+
+    parser.add_argument(
         "--debug",
         help="Enable verbose output",
         action="store_true",
@@ -98,6 +106,12 @@ def main() -> int:
                 enable_revived=False,
                 alerts=[AlertDestination.parse(alert) for alert in alerts],
             )
+            # with --fail-on-scan, we dont consider mirror failures (rc 2 and 3)
+            # as general failures but *normal* mirror operations
+            # and thus don't propagate.
+            # but we still need to skip the scan as it wouldn't work
+            if args.fail_on_scan and mp in (2, 3):
+                return 0
             if mp != 0:
                 return mp
             # probe succeeded, run scan
