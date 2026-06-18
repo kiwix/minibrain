@@ -336,7 +336,7 @@ def makehashes(
                 f">> {format_timespan(bag.duration)} at {format_size(bag.speed)}/s"
             )
 
-            logger.debug("> [{dry_run=}] Recording hashes in DB")
+            logger.debug(f"> [{dry_run=}] Recording hashes in DB")
             if not dry_run:
                 record_hashes_in_db(
                     db=database,
