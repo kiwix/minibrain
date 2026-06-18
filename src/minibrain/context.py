@@ -20,7 +20,9 @@ DEFAULT_SLACK_TIMEOUT: int = int(os.getenv("SLACK_TIMEOUT", "10"))
 DEFAULT_HTTP_PROBE_TIMEOUT: int = int(os.getenv("HTTP_PROBE_TIMEOUT", "10"))
 DEFAULT_HTTP_SCAN_TIMEOUT: int = int(os.getenv("HTTP_SCAN_TIMEOUT", "20"))
 DEFAULT_RSYNC_SCAN_TIMEOUT: int = int(os.getenv("RSYNC_SCAN_TIMEOUT", "20"))
-DEFAULT_ALERTS: list[str] = os.getenv("ALERTS", "").split(",")
+DEFAULT_ALERTS: list[str] = (
+    os.environ["ALERTS"].split(",") if os.getenv("ALERTS") else []
+)
 DEFAULT_DEBUG_PEEWEE: bool = bool(os.getenv("DEBUG_PEEWEE", ""))
 
 
