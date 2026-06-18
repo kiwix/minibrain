@@ -27,6 +27,7 @@ COPY *.md /src/
 COPY server/conf/mirrorbrain.conf /etc/mirrorbrain.conf
 COPY motd /etc/motd
 COPY entrypoint.sh /usr/local/bin/entrypoint
+COPY fakesync/forever-entrypoint.py /usr/local/bin/forever
 
 # Install + cleanup
 RUN \
