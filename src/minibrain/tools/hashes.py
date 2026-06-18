@@ -279,9 +279,7 @@ def makehashes(
                 target_file.unlink()
             removed_targets += 1
 
-    logger.info(
-        f"[{dry_run=}] Removed {removed_targets:,} target files"
-    )
+    logger.info(f"[{dry_run=}] Removed {removed_targets:,} target files")
 
     # stat() source and target and remove matching from list
     for source_file in set(source_files):
@@ -293,7 +291,9 @@ def makehashes(
 
         elif target_file.is_dir():
             # a previous folder is now a new file, we need to remove it
-            logger.debug(f"[{dry_run=}] Removing dir {target_file} in hash-tree: it's a file now")
+            logger.debug(
+                f"[{dry_run=}] Removing dir {target_file} in hash-tree: it's a file now"
+            )
             if not dry_run:
                 shutil.rmtree(target_file)
             continue
