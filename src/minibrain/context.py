@@ -21,6 +21,7 @@ DEFAULT_HTTP_PROBE_TIMEOUT: int = int(os.getenv("HTTP_PROBE_TIMEOUT", "10"))
 DEFAULT_HTTP_SCAN_TIMEOUT: int = int(os.getenv("HTTP_SCAN_TIMEOUT", "20"))
 DEFAULT_RSYNC_SCAN_TIMEOUT: int = int(os.getenv("RSYNC_SCAN_TIMEOUT", "20"))
 DEFAULT_ALERTS: list[str] = os.getenv("ALERTS", "").split(",")
+DEFAULT_DEBUG_PEEWEE: bool = bool(os.getenv("DEBUG_PEEWEE", ""))
 
 
 @dataclass(kw_only=True)
@@ -64,6 +65,7 @@ class Context:
     rsync_scan_timeout: int = DEFAULT_RSYNC_SCAN_TIMEOUT
 
     debug: bool = False
+    debug_peewee: bool = DEFAULT_DEBUG_PEEWEE
 
     mb_name: str = ""
     mb_dbuser: str = ""
@@ -105,6 +107,10 @@ class Context:
             format="%(message)s",
             datefmt="[%X]",
             handlers=[RichHandler()],
+        )
+        debug_peewee = cls._instance.debug_peewee if cls._instance else cls.debug_peewee
+        logging.getLogger("peewee").setLevel(
+            logging.DEBUG if debug_peewee else logging.INFO
         )
 
     @classmethod
