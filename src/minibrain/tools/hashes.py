@@ -228,7 +228,7 @@ def record_hashes_in_db(
         else:
             db.execute_sql(  # pyright: ignore[reportUnknownMemberType]
                 "UPDATE hash SET "
-                "mtime = %s, , size = %s, md5 = %b, sha1 = %b, sha256 = %b, "
+                "mtime = %s, size = %s, md5 = %b, sha1 = %b, sha256 = %b, "
                 "sha1piecesize = %s, sha1pieces = %b, btih = %b, "
                 "pgp = %s, zblocksize = %s, zhashlens = %s, zsums = %b) "
                 "WHERE file_id = %s;",
