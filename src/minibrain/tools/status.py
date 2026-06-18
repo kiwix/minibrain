@@ -1,5 +1,4 @@
 # pyright: strict, reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false
-from humanfriendly import format_size
 from peewee import PostgresqlDatabase
 from rich.console import Console
 from rich.status import Status
@@ -9,7 +8,7 @@ from rich.text import Text
 from minibrain.context import Context
 from minibrain.db import Server, database
 from minibrain.utils.db import get_mb_version
-from minibrain.utils.misc import format_dt
+from minibrain.utils.misc import format_dt, format_size
 
 context = Context.get()
 logger = context.logger

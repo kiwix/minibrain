@@ -1,13 +1,11 @@
 from collections.abc import Iterable
 from pathlib import Path
 
-from humanfriendly import format_size
-
 from minibrain.context import Context
 from minibrain.db import database
 from minibrain.utils.db import get_mb_version
 from minibrain.utils.fs import create_sparse
-from minibrain.utils.misc import format_ts
+from minibrain.utils.misc import format_size_long, format_ts
 
 context = Context.get()
 logger = context.logger
@@ -41,7 +39,9 @@ def pullhashestree(*, source_path: Path, target_path: Path, dry_run: bool) -> in
         (),
     )
     for file_id, path, size, mtime in cursor:  # pyright: ignore
-        logger.debug(f"fid={file_id}: {path}, {format_size(size)}, {format_ts(mtime)}")  # pyright: ignore[reportUnknownArgumentType]
+        logger.debug(
+            f"fid={file_id}: {path}, {format_size_long(size)}, {format_ts(mtime)}" # pyright: ignore[reportUnknownArgumentType]
+        )  # pyright: ignore[reportUnknownArgumentType]
         source_file = source_path.joinpath(path)  # pyright: ignore[reportUnknownArgumentType]
         target_file = target_path.joinpath(path)  # pyright: ignore[reportUnknownArgumentType]
 

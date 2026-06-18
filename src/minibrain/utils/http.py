@@ -7,7 +7,7 @@ import requests
 
 from minibrain.context import Context
 from minibrain.utils.fs import get_normalized_path
-from minibrain.utils.misc import format_size
+from minibrain.utils.misc import format_size_long
 
 context = Context.get()
 logger = context.logger
@@ -127,7 +127,7 @@ def get_nginx_listing(
         # add relative (to base_url) filepath to list of files
         for file in files:
             rel_path = f"{current_url}{file.fname}"[len(url) :]
-            desc = f"{format_size(file.size)} {file.date} {rel_path}"
+            desc = f"{format_size_long(file.size)} {file.date} {rel_path}"
             if any(exclude.search(rel_path) for exclude in excludes_re):
                 logger.warning(f"http skip excluded: {desc}")
                 continue

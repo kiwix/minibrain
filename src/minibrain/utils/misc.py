@@ -7,7 +7,11 @@ import humanfriendly
 
 
 def format_size(size: int) -> str:
-    return f"{size!s} ({humanfriendly.format_size(size, True)})"
+    return humanfriendly.format_size(size, True)
+
+
+def format_size_long(size: int) -> str:
+    return f"{size!s} ({format_size(size=size)})"
 
 
 def format_dt(dt: datetime.datetime) -> str:
@@ -16,6 +20,10 @@ def format_dt(dt: datetime.datetime) -> str:
 
 def format_ts(ts: int | float) -> str:
     return format_dt(datetime.datetime.fromtimestamp(ts, tz=datetime.UTC))
+
+
+def format_timespan(seconds: int | float) -> str:
+    return humanfriendly.format_timespan(seconds)
 
 
 def exit_gracefully(signum: int, frame: FrameType | None):  # noqa: ARG001

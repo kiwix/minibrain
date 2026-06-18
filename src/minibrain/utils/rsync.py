@@ -6,7 +6,7 @@ from pathlib import Path
 
 from minibrain.context import Context
 from minibrain.utils.fs import get_normalized_path, is_world_readable, perms_to_mode
-from minibrain.utils.misc import format_size
+from minibrain.utils.misc import format_size_long
 
 context = Context.get()
 logger = context.logger
@@ -74,7 +74,7 @@ def get_rsync_listing(
             perms = f"{ft}{perms}"
         mode = perms_to_mode(perms)
 
-        desc = f"{perms} {format_size(int(size_s))} {mtime_s} {path}"
+        desc = f"{perms} {format_size_long(int(size_s))} {mtime_s} {path}"
 
         # not recording folders
         if stat.S_ISDIR(mode):
