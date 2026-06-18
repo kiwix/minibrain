@@ -15,7 +15,7 @@ from minibrain.context import Context
 from minibrain.db import database
 from minibrain.utils.db import get_mb_version
 from minibrain.utils.fs import create_sparse
-from minibrain.utils.misc import format_size, format_ts
+from minibrain.utils.misc import format_size, format_timespan, format_ts
 
 context = Context.get()
 logger = context.logger
@@ -315,7 +315,7 @@ def makehashes(
         target_file = target_path.joinpath(relpath)
         source_info = source_file.stat(follow_symlinks=False)
         logger.info(
-            f"{relpath}, size={format_size(source_info.st_size)} "
+            f"{relpath}, {format_size(source_info.st_size)} "
             f"{format_ts(source_info.st_mtime)}"
         )
 
@@ -327,6 +327,9 @@ def makehashes(
         with FileLock(lock_file, timeout=0):
             logger.debug(f"Computing hashes for {source_file}")
             bag = compute_hashes(fpath=source_file, filesize=source_info.st_size)
+            logger.debug(
+                f"> {format_timespan(bag.duration)} at {format_size(bag.speed)}/s"
+            )
 
             logger.debug(f"Recording hashes in DB for {relpath}")
             if not dry_run:
