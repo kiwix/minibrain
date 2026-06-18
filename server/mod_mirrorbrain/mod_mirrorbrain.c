@@ -1770,7 +1770,10 @@ static int mb_handler(request_rec *r)
         ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, 
                 "[mod_mirrorbrain] No MirrorBrainDBDQuery configured!");
         setenv_give(r, "file");
-        return DECLINED;
+        
+        // return DECLINED;
+        // MB is misconfigured, not a reason to send crap
+        return HTTP_INTERNAL_SERVER_ERROR;
     }
 
 
@@ -1880,7 +1883,10 @@ static int mb_handler(request_rec *r)
     if (scfg->query_label == NULL) {
         ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, "[mod_mirrorbrain] No database query prepared!");
         setenv_give(r, "file");
-        return DECLINED;
+
+        // return DECLINED;
+        // MB is misconfigured, not a reason to send crap
+        return HTTP_INTERNAL_SERVER_ERROR;
     }
 
     ap_dbd_t *dbd = mb_dbd_acquire_fn(r);
@@ -2055,7 +2061,10 @@ static int mb_handler(request_rec *r)
             ap_log_rerror(APLOG_MARK, APLOG_ERR, rv, r,
                       "[mod_mirrorbrain] Error looking up %s in database: %s", 
                       filename, (errmsg ? errmsg : "[???]"));
-            return DECLINED;
+            // return DECLINED;
+
+            // MB is misconfigured or table state NOK, not a reason to send crap
+            return HTTP_INTERNAL_SERVER_ERROR;
         }
 
         new = apr_array_push(mirrors);
@@ -3535,11 +3544,15 @@ static int mb_handler(request_rec *r)
     }
 
     if (!chosen) {
-        ap_log_rerror(APLOG_MARK, APLOG_NOTICE, 0, r, 
-            "[mod_mirrorbrain] '%s': no usable mirrors after classification. Have to deliver directly.",
-            filename);
         setenv_give(r, "file");
-        return DECLINED;
+        // ap_log_rerror(APLOG_MARK, APLOG_NOTICE, 0, r, 
+        //     "[mod_mirrorbrain] '%s': no usable mirrors after classification. Have to deliver directly.",
+        //     filename);
+        // return DECLINED;
+
+        ap_log_rerror(APLOG_MARK, APLOG_NOTICE, 0, r, 
+            "[mod_mirrorbrain] '%s': no usable mirrors after classification. Sending 404.", filename);
+        return HTTP_NOT_FOUND;
     }
     debugLog(r, cfg, "Chose server %s", chosen->identifier);
 
