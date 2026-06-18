@@ -254,7 +254,7 @@ def makehashes(
     context = Context.get()
 
     logger.info(f"Starting mirrorprobe for {context.dsn}")
-    logger.info(f"Connected to mirrorbrain DB version {get_mb_version()}")
+    logger.debug(f"Connected to mirrorbrain DB version {get_mb_version()}")
 
     # get list of source files
     source_files = get_source_files(

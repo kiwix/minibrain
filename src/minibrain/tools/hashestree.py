@@ -15,7 +15,7 @@ def pullhashestree(*, source_path: Path, target_path: Path, dry_run: bool) -> in
     context = Context.get()
 
     logger.info(f"Starting mirrorprobe for {context.dsn}")
-    logger.info(f"Connected to mirrorbrain DB version {get_mb_version()}")
+    logger.debug(f"Connected to mirrorbrain DB version {get_mb_version()}")
 
     target_path.mkdir(parents=True, exist_ok=True)
 

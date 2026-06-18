@@ -28,7 +28,7 @@ def mirrorprobe(
     if not all(dest.is_valid for dest in alerts):
         logger.warning("You have invalid --alerts")
 
-    logger.info(f"Connected to mirrorbrain DB version {get_mb_version()}")
+    logger.debug(f"Connected to mirrorbrain DB version {get_mb_version()}")
 
     try:
         mirror = Server.select().where(Server.identifier == mirror_id).get()
