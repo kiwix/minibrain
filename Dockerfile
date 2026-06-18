@@ -5,20 +5,21 @@ LABEL org.opencontainers.image.source=https://github.com/kiwix/minibrain
 ENV MIRRORBRAIN_CONFIG_FILE=/etc/mirrorbrain.conf
 # run /etc/profile on shells (displays out motd)
 ENV ENV="/etc/profile"
+ENV VIRTUAL_ENV=/usr/local/mbenv
 
 RUN \
     apk add --no-cache dumb-init python3 \
     rsync \
     # python dependencies
-    && python3 -m venv /usr/local/mbenv \
-    && /usr/local/mbenv/bin/pip3 install --no-cache-dir -U pip
+    && python3 -m venv $VIRTUAL_ENV \
+    && $VIRTUAL_ENV/bin/pip3 install --no-cache-dir -U pip
 
 # Copy pyproject.toml and its dependencies
 COPY pyproject.toml README.md /src/
 COPY src/minibrain/__about__.py /src/src/minibrain/__about__.py
 
 # Install Python dependencies
-RUN /usr/local/mbenv/bin/pip install --no-cache-dir /src
+RUN $VIRTUAL_ENV/bin/pip install --no-cache-dir /src
 
 # Copy code + associated artifacts
 COPY src /src/src
@@ -29,10 +30,10 @@ COPY entrypoint.sh /usr/local/bin/entrypoint
 
 # Install + cleanup
 RUN \
-    /usr/local/mbenv/bin/pip install --no-cache-dir /src \
+    $VIRTUAL_ENV/bin/pip install --no-cache-dir /src \
     && rm -rf /src \
     && printf "\
-export PATH=\"/usr/local/mbenv/bin:${PATH}\"\n\
+export PATH=\"${VIRTUAL_ENV}/bin:\${PATH}\"\n\
 /bin/cat /etc/motd\n\
 " >> /etc/profile
 
