@@ -9,6 +9,7 @@ from pathlib import Path
 import psycopg
 from filelock import FileLock
 from peewee import PostgresqlDatabase
+from rich.progress import track
 
 from minibrain.context import Context
 from minibrain.db import database
@@ -253,7 +254,7 @@ def makehashes(
             logger.debug(f"Removing hash-file {target_file}: not in source anymore")
             if not dry_run:
                 target_file.unlink()
-    logger.info(f"Target now contains {len(target_files):,} files")
+    logger.info(f"Target now contains {len(target_files):,} files after cleanup")
 
     # stat() source and target and remove matching from list
     for source_file in set(source_files):
@@ -287,7 +288,7 @@ def makehashes(
     logger.info(f"There are {len(source_files):,} files to compute hashes for")
 
     # remains list of new/updated files needing hashes
-    for source_file in source_files:
+    for source_file in track(source_files, description="Making hashes…"):
         relpath = source_file.relative_to(base_path)
         target_file = target_path.joinpath(relpath)
         source_info = source_file.stat(follow_symlinks=False)
