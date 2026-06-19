@@ -71,6 +71,7 @@ def run(root: Path, map_path: Path, prefix: str, *, dry_run: bool) -> int:
             logger.info("DRY-RUN, no change to map file.")
             return 0
 
+        tmp_file.chmod(0o644)
         tmp_file.rename(map_path)
     finally:
         tmp_file.unlink(missing_ok=True)
