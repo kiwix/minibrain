@@ -7,7 +7,7 @@ import humanfriendly
 
 
 def format_size(size: int) -> str:
-    return humanfriendly.format_size(size, True)
+    return humanfriendly.format_size(size, binary=True)
 
 
 def format_size_long(size: int) -> str:
