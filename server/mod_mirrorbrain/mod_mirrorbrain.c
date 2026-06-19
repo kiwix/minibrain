@@ -2548,23 +2548,29 @@ static int mb_handler(request_rec *r)
              * encoded, not hex. But it's probably not worth adding Base32
              * encoder just for this. */
             APR_ARRAY_PUSH(m, char *) = 
-                apr_psprintf(r->pool, "&amp;xt=urn:sha1:%s", hashbag->sha1hex);
+                apr_psprintf(r->pool, "&xt=urn:sha1:%s", hashbag->sha1hex);
 #endif
             /* MD5 */
             APR_ARRAY_PUSH(m, char *) = 
-                apr_psprintf(r->pool, "&amp;xt=urn:md5:%s", hashbag->md5hex);
+                apr_psprintf(r->pool, "&xt=urn:md5:%s", hashbag->md5hex);
 
             /* size */
             APR_ARRAY_PUSH(m, char *) = 
-                apr_psprintf(r->pool, "&amp;xl=%s", apr_off_t_toa(r->pool, r->finfo.size));
+                apr_psprintf(r->pool, "&xl=%s", apr_off_t_toa(r->pool, r->finfo.size));
 
             /* file basename */
             APR_ARRAY_PUSH(m, char *) = 
-                apr_psprintf(r->pool, "&amp;dn=%s", ap_escape_uri(r->pool, basename));
+                apr_psprintf(r->pool, "&dn=%s", ap_escape_uri(r->pool, basename));
 
             /* a HTTP link to the file */
             APR_ARRAY_PUSH(m, char *) = 
-                apr_psprintf(r->pool, "&amp;as=%s://%s%s%s", ap_http_scheme(r), 
+                apr_psprintf(r->pool, "&as=%s://%s%s%s", ap_http_scheme(r), 
+                                                             ap_escape_uri(r->pool, thisserver), 
+                                                             thisport, 
+                                                             ap_escape_uri(r->pool, r->uri));
+            /* also sets it as webseed */
+            APR_ARRAY_PUSH(m, char *) = 
+                apr_psprintf(r->pool, "&ws=%s://%s%s%s", ap_http_scheme(r), 
                                                              ap_escape_uri(r->pool, thisserver), 
                                                              thisport, 
                                                              ap_escape_uri(r->pool, r->uri));
@@ -2573,9 +2579,78 @@ static int mb_handler(request_rec *r)
                 for (i = 0; i < scfg->tracker_urls->nelts; i++) {
                     char *url = ((char **) scfg->tracker_urls->elts)[i];
                     APR_ARRAY_PUSH(m, char *) = 
-                        apr_psprintf(r->pool, "&amp;tr=%s", ap_escape_uri(r->pool, url));
+                        apr_psprintf(r->pool, "&tr=%s", ap_escape_uri(r->pool, url));
                 }
             }
+
+            /* Add one webseed for each mirror */
+            // Mirrors in the same network
+            mirrorp = (mirror_entry_t **)mirrors_same_prefix->elts;
+            for (i = 0; i < mirrors_same_prefix->nelts; i++) {
+                mirror = mirrorp[i];
+                APR_ARRAY_PUSH(m, char *) = 
+                    apr_psprintf(r->pool, "&ws=%s://%s%s%s", ap_http_scheme(r), 
+                                 ap_escape_uri(r->pool, mirror->baseurl), 
+                                 thisport, 
+                                 ap_escape_uri(r->pool, filename));
+            }
+
+            // Mirrors in the same AS
+            mirrorp = (mirror_entry_t **)mirrors_same_as->elts;
+            for (i = 0; i < mirrors_same_as->nelts; i++) {
+                mirror = mirrorp[i];
+                if (mirror->prefix_only)
+                    continue;
+                APR_ARRAY_PUSH(m, char *) = 
+                    apr_psprintf(r->pool, "&ws=%s://%s%s", ap_http_scheme(r), 
+                                 ap_escape_uri(r->pool, mirror->baseurl), 
+                                 ap_escape_uri(r->pool, filename));
+            }
+
+            // Mirrors which handle this country
+            mirrorp = (mirror_entry_t **)mirrors_same_country->elts;
+            for (i = 0; i < mirrors_same_country->nelts; i++) {
+                mirror = mirrorp[i];
+                if (mirror->prefix_only || mirror->as_only)
+                    continue;
+                APR_ARRAY_PUSH(m, char *) = 
+                    apr_psprintf(r->pool, "&ws=%s://%s%s", ap_http_scheme(r), 
+                                 ap_escape_uri(r->pool, mirror->baseurl), 
+                                 ap_escape_uri(r->pool, filename));
+            }
+
+            // Mirrors in the same continent
+            mirrorp = (mirror_entry_t **)mirrors_same_region->elts;
+            for (i = 0; i < mirrors_same_region->nelts; i++) {
+                mirror = mirrorp[i];
+                if (mirror->prefix_only || mirror->as_only || mirror->country_only)
+                    continue;
+                APR_ARRAY_PUSH(m, char *) = 
+                    apr_psprintf(r->pool, "&ws=%s://%s%s", ap_http_scheme(r), 
+                                 ap_escape_uri(r->pool, mirror->baseurl), 
+                                 ap_escape_uri(r->pool, filename));
+            }
+
+            // Mirrors in the rest of the world
+            mirrorp = (mirror_entry_t **)mirrors_elsewhere->elts;
+            for (i = 0; i < mirrors_elsewhere->nelts; i++) {
+                mirror = mirrorp[i];
+                if (mirror->prefix_only || mirror->as_only 
+                        || mirror->country_only || mirror->region_only) {
+                    continue;
+                }
+                APR_ARRAY_PUSH(m, char *) = 
+                    apr_psprintf(r->pool, "&ws=%s://%s%s", ap_http_scheme(r), 
+                                 ap_escape_uri(r->pool, mirror->baseurl), 
+                                 ap_escape_uri(r->pool, filename));
+            }
+
+            /* add torrent URL */
+            APR_ARRAY_PUSH(m, char *) = 
+                apr_psprintf(r->pool, "&xs=%s://%s%s%s.torrent", ap_http_scheme(r), 
+                                                             ap_escape_uri(r->pool, thisserver), 
+                                                             thisport, 
+                                                             ap_escape_uri(r->pool, r->uri));
 
             magnet = apr_array_pstrcat(r->pool, m, '\0');
         }
