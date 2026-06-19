@@ -21,6 +21,7 @@ jobs:
           image-name: kiwix/minibrain-server
           on-master: latest
           restrict-to: kiwix/minibrain
+          manual-tag: magnet
           context: server
           registries: ghcr.io
           credentials:
