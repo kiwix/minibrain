@@ -2569,7 +2569,8 @@ static int mb_handler(request_rec *r)
                                                              thisport, 
                                                              ap_escape_uri(r->pool, r->uri));
             /* also sets it as webseed */
-            apr_psprintf(r->pool, "&ws=%s://%s%s%s", ap_http_scheme(r), 
+            APR_ARRAY_PUSH(m, char *) = 
+                apr_psprintf(r->pool, "&ws=%s://%s%s%s", ap_http_scheme(r), 
                                                              ap_escape_uri(r->pool, thisserver), 
                                                              thisport, 
                                                              ap_escape_uri(r->pool, r->uri));
@@ -2587,10 +2588,11 @@ static int mb_handler(request_rec *r)
             mirrorp = (mirror_entry_t **)mirrors_same_prefix->elts;
             for (i = 0; i < mirrors_same_prefix->nelts; i++) {
                 mirror = mirrorp[i];
-                apr_psprintf(r->pool, "&ws=%s://%s%s%s", ap_http_scheme(r), 
-                             ap_escape_uri(r->pool, mirror->baseurl), 
-                             thisport, 
-                             ap_escape_uri(r->pool, filename));
+                APR_ARRAY_PUSH(m, char *) = 
+                    apr_psprintf(r->pool, "&ws=%s://%s%s%s", ap_http_scheme(r), 
+                                 ap_escape_uri(r->pool, mirror->baseurl), 
+                                 thisport, 
+                                 ap_escape_uri(r->pool, filename));
             }
 
             // Mirrors in the same AS
@@ -2599,9 +2601,10 @@ static int mb_handler(request_rec *r)
                 mirror = mirrorp[i];
                 if (mirror->prefix_only)
                     continue;
-                apr_psprintf(r->pool, "&ws=%s://%s%s", ap_http_scheme(r), 
-                             ap_escape_uri(r->pool, mirror->baseurl), 
-                             ap_escape_uri(r->pool, filename));
+                APR_ARRAY_PUSH(m, char *) = 
+                    apr_psprintf(r->pool, "&ws=%s://%s%s", ap_http_scheme(r), 
+                                 ap_escape_uri(r->pool, mirror->baseurl), 
+                                 ap_escape_uri(r->pool, filename));
             }
 
             // Mirrors which handle this country
@@ -2610,9 +2613,10 @@ static int mb_handler(request_rec *r)
                 mirror = mirrorp[i];
                 if (mirror->prefix_only || mirror->as_only)
                     continue;
-                apr_psprintf(r->pool, "&ws=%s://%s%s", ap_http_scheme(r), 
-                             ap_escape_uri(r->pool, mirror->baseurl), 
-                             ap_escape_uri(r->pool, filename));
+                APR_ARRAY_PUSH(m, char *) = 
+                    apr_psprintf(r->pool, "&ws=%s://%s%s", ap_http_scheme(r), 
+                                 ap_escape_uri(r->pool, mirror->baseurl), 
+                                 ap_escape_uri(r->pool, filename));
             }
 
             // Mirrors in the same continent
@@ -2621,9 +2625,10 @@ static int mb_handler(request_rec *r)
                 mirror = mirrorp[i];
                 if (mirror->prefix_only || mirror->as_only || mirror->country_only)
                     continue;
-                apr_psprintf(r->pool, "&ws=%s://%s%s", ap_http_scheme(r), 
-                             ap_escape_uri(r->pool, mirror->baseurl), 
-                             ap_escape_uri(r->pool, filename));
+                APR_ARRAY_PUSH(m, char *) = 
+                    apr_psprintf(r->pool, "&ws=%s://%s%s", ap_http_scheme(r), 
+                                 ap_escape_uri(r->pool, mirror->baseurl), 
+                                 ap_escape_uri(r->pool, filename));
             }
 
             // Mirrors in the rest of the world
@@ -2634,9 +2639,10 @@ static int mb_handler(request_rec *r)
                         || mirror->country_only || mirror->region_only) {
                     continue;
                 }
-                apr_psprintf(r->pool, "&ws=%s://%s%s", ap_http_scheme(r), 
-                             ap_escape_uri(r->pool, mirror->baseurl), 
-                             ap_escape_uri(r->pool, filename));
+                APR_ARRAY_PUSH(m, char *) = 
+                    apr_psprintf(r->pool, "&ws=%s://%s%s", ap_http_scheme(r), 
+                                 ap_escape_uri(r->pool, mirror->baseurl), 
+                                 ap_escape_uri(r->pool, filename));
             }
 
             /* add torrent URL */
