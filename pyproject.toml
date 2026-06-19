@@ -53,6 +53,7 @@ makehashes = "minibrain.entrypoints.makehashes:entrypoint"
 pull-hashestree = "minibrain.entrypoints.pull_hashestree:entrypoint"
 status = "minibrain.entrypoints.status:entrypoint"
 copydb = "minibrain.entrypoints.copydb:entrypoint"
+test-hash = "minibrain.entrypoints.test_hash:entrypoint"
 
 [tool.hatch.version]
 path = "src/minibrain/__about__.py"

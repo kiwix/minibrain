@@ -112,7 +112,7 @@ class HashBag:
         with open(self.fpath, "rb") as fp:
             while True:
                 buf = fp.read(self.sha1_piecesize)
-                if not buf or len(buf) != self.sha1_piecesize:
+                if not buf:
                     break
 
                 md5_digest.update(buf)
