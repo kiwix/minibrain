@@ -15,3 +15,4 @@ $ makehashes        compute hashes from source files and update DB
 $ test-hash         hash a single file and print its results
 $ gen-zim-map       create an apache map of version-less ZIM filename to last path
 $ cleandb           allows vacuuming the DB or removing gone (from master) files
+$ genlist           generate list of mirrors (JSON format)
