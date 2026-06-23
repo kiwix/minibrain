@@ -28,7 +28,7 @@ CREATE TABLE "filearr" (
 
 
 CREATE TABLE "hash" (
-        "file_id" INTEGER REFERENCES filearr PRIMARY KEY,
+        "file_id" INTEGER REFERENCES filearr ON DELETE CASCADE PRIMARY KEY,
         "mtime" INTEGER NOT NULL,
         "size" BIGINT NOT NULL,
         "md5"    BYTEA NOT NULL,
