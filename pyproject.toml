@@ -55,6 +55,7 @@ status = "minibrain.entrypoints.status:entrypoint"
 copydb = "minibrain.entrypoints.copydb:entrypoint"
 test-hash = "minibrain.entrypoints.test_hash:entrypoint"
 gen-zim-map = "minibrain.entrypoints.gen_zim_map:entrypoint"
+cleandb = "minibrain.entrypoints.cleandb:entrypoint"
 
 [tool.hatch.version]
 path = "src/minibrain/__about__.py"

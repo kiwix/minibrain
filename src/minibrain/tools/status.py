@@ -38,6 +38,7 @@ def mbstatus() -> int:
     table.add_column("Nb. files", justify="right", style="green")
     table.add_column("Last scan", justify="right", style="")
     table.add_column("Size", justify="right", style="")
+    table.add_column("ID", justify="right", style="")
 
     with Status(status="Querying database…"):
         for server in Server.select().order_by(
@@ -74,6 +75,7 @@ def mbstatus() -> int:
                     style=style,
                 ),
                 Text(format_size(total_size)),
+                Text(f"{server.id}"),
             )
 
     console = Console()
