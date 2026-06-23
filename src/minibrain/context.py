@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, get_origin
 
+from rich.console import Console
 from rich.logging import RichHandler
 
 DEFAULT_CONFIG_PATH = os.getenv("MIRRORBRAIN_CONFIG_FILE", "/etc/mirrorbrain.conf")
@@ -88,6 +89,7 @@ class Context:
     mirrorprobe_logfile: str = ""
     mirrorprobe_loglevel: str = ""
 
+    console: Console = Console(stderr=True)  # noqa: RUF009
     logger: logging.Logger = logging.getLogger("mb")  # noqa: RUF009
 
     @classmethod
@@ -108,7 +110,11 @@ class Context:
             level=logging.DEBUG if debug else "INFO",
             format="%(message)s",
             datefmt="[%X]",
-            handlers=[RichHandler()],
+            handlers=[
+                RichHandler(
+                    console=cls._instance.console if cls._instance else cls.console
+                )
+            ],
         )
         debug_peewee = cls._instance.debug_peewee if cls._instance else cls.debug_peewee
         logging.getLogger("peewee").setLevel(
