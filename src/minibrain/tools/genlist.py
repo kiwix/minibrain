@@ -8,7 +8,7 @@ from rich.status import Status
 
 from minibrain.context import Context
 from minibrain.db import Server, database
-from minibrain.utils.db import get_mb_version
+from minibrain.utils.db import get_geo_summary, get_mb_version
 
 context = Context.get()
 logger = context.logger
@@ -24,13 +24,6 @@ def get_single(
     return next(db.execute_sql(query, args))[0]  # pyright: ignore
 
 
-AREAS = {
-    "Americas": "ag,ai,ar,aw,bb,bl,bm,bo,bq,br,bs,bz,ca,cl,co,cr,cu,cw,dm,do,ec,fk,"
-    "gd,gf,gl,gp,gt,gy,hn,ht,jm,kn,ky,lc,mf,mq,ms,mx,ni,pa,pe,pm,pr,py,sr,sv,sx,tc,"
-    "tt,us,uy,vc,ve,vg,vi"
-}
-
-
 def gen_json_mirrorlist(to_path: Path | None) -> int:
 
     logger.info(f"Starting status for {context.dsn}")
@@ -39,16 +32,7 @@ def gen_json_mirrorlist(to_path: Path | None) -> int:
     metadata = {}
     mirrors = []
 
-    regions: dict[str, str] = {}
-    countries: dict[str, str] = {}
-
     with Status("Querying database…", console=context.console):
-        for code, name in database.execute_sql("SELECT code, name FROM region;"):
-            regions[code] = name
-
-        for code, name in database.execute_sql("SELECT code, name FROM country;"):
-            countries[code] = name
-
         for server in Server.select().order_by(
             Server.enabled.desc(), Server.identifier.asc()
         ):
@@ -66,36 +50,7 @@ def gen_json_mirrorlist(to_path: Path | None) -> int:
                 )
                 or 0
             )
-            serving_str = ""
-            worldwide = False
-            if server.prefix_only:
-                serving_str = f"Only {server.prefix}"
-            elif server.as_only:
-                serving_str = f"Only AS {server.asn}"
-            elif server.region_only:
-                serving_str = f"Only {regions.get(server.region, server.region)}"
-            elif server.country_only and server.country != "**":
-                serving_str = f"Only {countries.get(server.country, server.country)}"
-            else:
-                worldwide = True
-
-            if server.other_countries:
-                zone = ", ".join(
-                    [
-                        str(countries.get(oc, oc))
-                        for oc in server.other_countries.split(",")
-                    ]
-                )
-                for name, other_countries in AREAS.items():
-                    if server.other_countries == other_countries:
-                        zone = name
-                        break
-                if serving_str:
-                    serving_str += " and "
-                serving_str += zone
-
-            if worldwide:
-                serving_str = "Worldwide"
+            serving_str = get_geo_summary(server)
 
             mirrors.append(
                 {

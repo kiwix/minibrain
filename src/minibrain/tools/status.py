@@ -7,7 +7,7 @@ from rich.text import Text
 
 from minibrain.context import Context
 from minibrain.db import Server, database
-from minibrain.utils.db import get_mb_version
+from minibrain.utils.db import get_geo_summary, get_mb_version
 from minibrain.utils.misc import format_dt, format_size
 
 context = Context.get()
@@ -39,6 +39,7 @@ def mbstatus() -> int:
     table.add_column("Last scan", justify="right", style="")
     table.add_column("Size", justify="right", style="")
     table.add_column("ID", justify="right", style="")
+    table.add_column("Serving", justify="left", style="")
 
     with Status(status="Querying database…"):
         for server in Server.select().order_by(
@@ -76,6 +77,7 @@ def mbstatus() -> int:
                 ),
                 Text(format_size(total_size)),
                 Text(f"{server.id}"),
+                Text(f"{get_geo_summary(server)}"),
             )
 
     console = Console()

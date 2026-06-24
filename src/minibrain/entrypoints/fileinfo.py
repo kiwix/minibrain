@@ -177,7 +177,8 @@ def print_search_results(*, path: str) -> int:
 
 
 def print_fileinfo(*, path: str) -> int:
-    from minibrain.db import Filearr, Hash  # noqa: PLC0415
+    from minibrain.db import Filearr, Hash, Server  # noqa: PLC0415
+    from minibrain.utils.db import get_geo_summary  # noqa: PLC0415
 
     # list of mirror with metadata
     mirrors = get_mirrors()
@@ -207,7 +208,8 @@ def print_fileinfo(*, path: str) -> int:
         else:
             style = "green"
         url = f"{mirror.baseurl}{path}"
-        mirrors_cell.append(f"\n{mirror.ident}", style=style)
+        mirrors_cell.append(f"\n{mirror.ident} ", style=style)
+        mirrors_cell.append(f"({get_geo_summary(Server.get(mirror_id))})")
         mirrors_cell.append("\n")
         mirrors_cell.append(f"{url}\n")
 
