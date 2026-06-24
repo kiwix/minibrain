@@ -1,4 +1,6 @@
-# pyright: strict, reportUnknownMemberType=false, reportUnknownVariableType=false
+# pyright: strict, reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false
+from dataclasses import dataclass
+
 from minibrain.db import Server, Version, database
 
 AREAS = {
@@ -11,6 +13,28 @@ AREAS = {
 def get_mb_version() -> str:
     version: Version = Version.get(id=1)
     return f"{version.major!s}.{version.minor!s}.{version.patchlevel!s}"
+
+
+@dataclass
+class MirrorSummary:
+    ident: str
+    baseurl: str
+    status: bool
+    enabled: bool
+
+
+def get_mirrors_summaries() -> dict[int, MirrorSummary]:
+    from minibrain.db import Server  # noqa: PLC0415
+
+    return {
+        server.id: MirrorSummary(
+            ident=server.identifier,
+            baseurl=server.baseurl,
+            status=server.status_baseurl,
+            enabled=server.enabled,
+        )
+        for server in Server.select()
+    }
 
 
 class Temp:

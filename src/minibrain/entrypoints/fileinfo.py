@@ -1,7 +1,6 @@
 # pyright: strict, reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false
 import argparse
 import sys
-from dataclasses import dataclass
 from pathlib import Path
 
 from peewee import DoesNotExist
@@ -83,7 +82,7 @@ def main() -> int:
         args = prepare_context(sys.argv[1:])
         register_exit_signals()
 
-        from minibrain.db import database  # noqa: PLC0415
+        from minibrain.db import database
 
         try:
             database.connect()
@@ -98,30 +97,9 @@ def main() -> int:
         return 1
 
 
-@dataclass
-class MirrorSummary:
-    ident: str
-    baseurl: str
-    status: bool
-    enabled: bool
-
-
-def get_mirrors() -> dict[int, MirrorSummary]:
-    from minibrain.db import Server  # noqa: PLC0415
-
-    return {
-        server.id: MirrorSummary(
-            ident=server.identifier,
-            baseurl=server.baseurl,
-            status=server.status_baseurl,
-            enabled=server.enabled,
-        )
-        for server in Server.select()
-    }
-
-
 def print_search_results(*, path: str) -> int:
-    from minibrain.db import Filearr, Hash  # noqa: PLC0415
+    from minibrain.db import Filearr, Hash
+    from minibrain.utils.db import get_mirrors_summaries
 
     with Status(status="Querying database…"):
         nb_results = Filearr.select().where(Filearr.path**path).count()
@@ -145,7 +123,7 @@ def print_search_results(*, path: str) -> int:
     table.add_column("Path")
 
     with Status(status="Querying database…"):
-        mirrors = get_mirrors()
+        mirrors = get_mirrors_summaries()
         for file in Filearr.select().where(Filearr.path**path).limit(max_results):
             nbm = len(file.mirrors)
             nbm_disabled = len([1 for mid in file.mirrors if not mirrors[mid].enabled])
@@ -184,11 +162,12 @@ def print_search_results(*, path: str) -> int:
 
 
 def print_fileinfo(*, path: str) -> int:
-    from minibrain.db import Filearr, Hash, Server  # noqa: PLC0415
-    from minibrain.utils.db import get_geo_summary  # noqa: PLC0415
+
+    from minibrain.db import Filearr, Hash, Server
+    from minibrain.utils.db import get_geo_summary, get_mirrors_summaries
 
     with Status(status="Querying database…"):
-        mirrors = get_mirrors()
+        mirrors = get_mirrors_summaries()
         try:
             file = Filearr.get(Filearr.path == path)
             hashes = Hash.get(Hash.file == file)

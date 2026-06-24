@@ -17,3 +17,4 @@ $ gen-zim-map       create an apache map of version-less ZIM filename to last pa
 $ cleandb           allows vacuuming the DB or removing gone (from master) files
 $ genlist           generate list of mirrors (JSON format)
 $ fileinfo          get all details about a specific file
+$ latest            get list of latest added files on the DB
