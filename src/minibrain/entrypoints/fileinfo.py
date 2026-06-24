@@ -6,6 +6,7 @@ from pathlib import Path
 
 from peewee import DoesNotExist
 from rich.console import Console
+from rich.status import Status
 from rich.table import Table
 from rich.text import Text
 
@@ -122,7 +123,8 @@ def get_mirrors() -> dict[int, MirrorSummary]:
 def print_search_results(*, path: str) -> int:
     from minibrain.db import Filearr, Hash  # noqa: PLC0415
 
-    nb_results = Filearr.select().where(Filearr.path**path).count()
+    with Status(status="Querying database…"):
+        nb_results = Filearr.select().where(Filearr.path**path).count()
 
     if not nb_results:
         logger.error(f"No results found for {path=}")
@@ -131,7 +133,6 @@ def print_search_results(*, path: str) -> int:
         return print_fileinfo(
             path=Filearr.select().where(Filearr.path**path).get().path
         )
-    mirrors = get_mirrors()
 
     max_results = 20
     has_more_results = nb_results > max_results
@@ -143,25 +144,31 @@ def print_search_results(*, path: str) -> int:
     table.add_column("Nb. mirrors")
     table.add_column("Path")
 
-    for file in Filearr.select().where(Filearr.path**path).limit(max_results):
-        nbm = len(file.mirrors)
-        nbm_disabled = len([1 for mid in file.mirrors if not mirrors[mid].enabled])
-        nbm_online = len(
-            [1 for mid in file.mirrors if mirrors[mid].status and mirrors[mid].enabled]
-        )
-        hashes = Hash.get(Hash.file == file)
-        mirrors_cell = Text(f"{nbm:,}")
-        mirrors_cell.append("/")
-        mirrors_cell.append(f"{nbm_disabled:,}", style="dim")
-        mirrors_cell.append("/")
-        mirrors_cell.append(f"{nbm_online:,}", style="green")
-        table.add_row(
-            f"{file.id}",
-            f"{format_size(hashes.size)}",
-            f"{format_ts(hashes.mtime)}",
-            mirrors_cell,
-            f"{file.path}",
-        )
+    with Status(status="Querying database…"):
+        mirrors = get_mirrors()
+        for file in Filearr.select().where(Filearr.path**path).limit(max_results):
+            nbm = len(file.mirrors)
+            nbm_disabled = len([1 for mid in file.mirrors if not mirrors[mid].enabled])
+            nbm_online = len(
+                [
+                    1
+                    for mid in file.mirrors
+                    if mirrors[mid].status and mirrors[mid].enabled
+                ]
+            )
+            hashes = Hash.get(Hash.file == file)
+            mirrors_cell = Text(f"{nbm:,}")
+            mirrors_cell.append("/")
+            mirrors_cell.append(f"{nbm_disabled:,}", style="dim")
+            mirrors_cell.append("/")
+            mirrors_cell.append(f"{nbm_online:,}", style="green")
+            table.add_row(
+                f"{file.id}",
+                f"{format_size(hashes.size)}",
+                f"{format_ts(hashes.mtime)}",
+                mirrors_cell,
+                f"{file.path}",
+            )
 
     console = Console()
     console.print("")
@@ -180,15 +187,14 @@ def print_fileinfo(*, path: str) -> int:
     from minibrain.db import Filearr, Hash, Server  # noqa: PLC0415
     from minibrain.utils.db import get_geo_summary  # noqa: PLC0415
 
-    # list of mirror with metadata
-    mirrors = get_mirrors()
-
-    try:
-        file = Filearr.get(Filearr.path == path)
-        hashes = Hash.get(Hash.file == file)
-    except DoesNotExist:
-        logger.error(f"No file found with {path=}")
-        return 1
+    with Status(status="Querying database…"):
+        mirrors = get_mirrors()
+        try:
+            file = Filearr.get(Filearr.path == path)
+            hashes = Hash.get(Hash.file == file)
+        except DoesNotExist:
+            logger.error(f"No file found with {path=}")
+            return 1
 
     fpath = Path(file.path)
 
