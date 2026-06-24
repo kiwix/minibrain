@@ -17,7 +17,9 @@ logger = context.logger
 logging.getLogger("filelock").setLevel(logging.INFO)
 
 
-def get_single_int(db: PostgresqlDatabase, query: str, args: tuple[str | int]) -> int:
+def get_single_int(
+    db: PostgresqlDatabase, query: str, args: tuple[str | int] | None
+) -> int:
     return get_single(db, query, args)  # pyright:  ignore
 
 
@@ -115,10 +117,10 @@ def syncmaster(*, master: str, dry_run: bool) -> int:
         db=database, query="SELECT mirr_get_nfiles(%s);", args=(master,)
     )
     nb_files_total = get_single_int(
-        db=database, query="SELECT COUNT(*) FROM filearr;", args=(1,)
+        db=database, query="SELECT COUNT(*) FROM filearr;", args=None
     )
     nb_hash_total = get_single_int(
-        db=database, query="SELECT COUNT(*) FROM hash;", args=(1,)
+        db=database, query="SELECT COUNT(*) FROM hash;", args=None
     )
     nb_to_delete_files = get_single_int(
         db=database,
