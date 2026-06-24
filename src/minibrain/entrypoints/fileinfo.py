@@ -10,7 +10,7 @@ from rich.table import Table
 from rich.text import Text
 
 from minibrain.__about__ import __version__
-from minibrain.context import DEFAULT_CONFIG_PATH, Context
+from minibrain.context import DEFAULT_CONFIG_PATH, DEFAULT_NB_MATCHING_FILES, Context
 from minibrain.utils.misc import (
     format_size,
     format_size_long,
@@ -57,6 +57,17 @@ def prepare_context(raw_args: list[str]) -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "-n",
+        help=(
+            f"Nb. of files to show in fuzzy mode. "
+            f"Defaults to {DEFAULT_NB_MATCHING_FILES}"
+        ),
+        dest="nb_files",
+        type=int,
+        default=DEFAULT_NB_MATCHING_FILES,
+    )
+
+    parser.add_argument(
         "--debug",
         help="Enable verbose output",
         action="store_true",
@@ -87,7 +98,7 @@ def main() -> int:
         try:
             database.connect()
             if args.fuzzy:
-                return print_search_results(path=args.path)
+                return print_search_results(path=args.path, max_results=args.nb_files)
             return print_fileinfo(path=args.path)
         finally:
             database.close()
@@ -97,7 +108,9 @@ def main() -> int:
         return 1
 
 
-def print_search_results(*, path: str) -> int:
+def print_search_results(
+    *, path: str, max_results: int = DEFAULT_NB_MATCHING_FILES
+) -> int:
     from minibrain.db import Filearr, Hash
     from minibrain.utils.db import get_mirrors_summaries
 
@@ -111,9 +124,6 @@ def print_search_results(*, path: str) -> int:
         return print_fileinfo(
             path=Filearr.select().where(Filearr.path**path).get().path
         )
-
-    max_results = 20
-    has_more_results = nb_results > max_results
 
     table = Table(title=f"{nb_results:,} DB results for {path} fuzzy=True")
     table.add_column("ID", justify="left", style="cyan", no_wrap=True)
@@ -152,7 +162,7 @@ def print_search_results(*, path: str) -> int:
     console.print("")
     console.print(table)
 
-    if has_more_results:
+    if nb_results > max_results:
         logger.info(
             f"There are {nb_results:,} results for this pattern. "
             f"Only showed {max_results:,}"

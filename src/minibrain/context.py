@@ -26,6 +26,7 @@ DEFAULT_ALERTS: list[str] = (
 )
 DEFAULT_DEBUG_PEEWEE: bool = bool(os.getenv("DEBUG_PEEWEE", ""))
 DEFAULT_NB_LATEST_FILES: int = int(os.getenv("NB_LATEST_FILES", "20"))
+DEFAULT_NB_MATCHING_FILES: int = int(os.getenv("NB_MATCHING_FILES", "20"))
 
 
 @dataclass(kw_only=True)
