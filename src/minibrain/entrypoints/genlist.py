@@ -69,8 +69,8 @@ def main() -> int:
         debug = context.debug
         register_exit_signals()
 
-        from minibrain.db import database  # noqa: PLC0415
-        from minibrain.tools.genlist import gen_json_mirrorlist  # noqa: PLC0415
+        from minibrain.db import database
+        from minibrain.tools.genlist import gen_json_mirrorlist
 
         try:
             database.connect()

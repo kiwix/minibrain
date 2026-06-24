@@ -98,8 +98,8 @@ def main() -> int:
         debug = context.debug
         register_exit_signals()
 
-        from minibrain.db import database  # noqa: PLC0415
-        from minibrain.tools.scan import mirrorscan  # noqa: PLC0415
+        from minibrain.db import database
+        from minibrain.tools.scan import mirrorscan
 
         try:
             database.connect()

@@ -48,7 +48,7 @@ def main() -> int:
         debug = context.debug
         register_exit_signals()
 
-        from minibrain.tools.hashes import HashBag  # noqa: PLC0415
+        from minibrain.tools.hashes import HashBag
 
         fpath = args.fpath
         filesize = fpath.stat().st_size

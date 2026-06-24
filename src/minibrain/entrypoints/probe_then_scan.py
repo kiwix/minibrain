@@ -93,9 +93,9 @@ def main() -> int:
         debug = context.debug
         register_exit_signals()
 
-        from minibrain.db import database  # noqa: PLC0415
-        from minibrain.tools.probe import mirrorprobe  # noqa: PLC0415
-        from minibrain.tools.scan import mirrorscan  # noqa: PLC0415
+        from minibrain.db import database
+        from minibrain.tools.probe import mirrorprobe
+        from minibrain.tools.scan import mirrorscan
 
         alerts: list[str] = args.alerts or []
         try:

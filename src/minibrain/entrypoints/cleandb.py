@@ -80,8 +80,8 @@ def main() -> int:
         debug = context.debug
         register_exit_signals()
 
-        from minibrain.db import database  # noqa: PLC0415
-        from minibrain.tools.cleandb import (  # noqa: PLC0415
+        from minibrain.db import database
+        from minibrain.tools.cleandb import (
             dbinfo,
             syncmaster,
             vacuum,
