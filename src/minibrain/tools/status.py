@@ -8,7 +8,7 @@ from rich.text import Text
 from minibrain.context import Context
 from minibrain.db import Server, database
 from minibrain.utils.db import get_geo_summary, get_mb_version
-from minibrain.utils.misc import format_dt, format_size
+from minibrain.utils.misc import format_bandwidth, format_dt, format_size
 
 context = Context.get()
 logger = context.logger
@@ -38,6 +38,7 @@ def mbstatus() -> int:
     table.add_column("Nb. files", justify="right", style="green")
     table.add_column("Last scan", justify="right", style="")
     table.add_column("Size", justify="right", style="")
+    table.add_column("Score/speed", justify="left", style="")
     table.add_column("ID", justify="right", style="")
     table.add_column("Serving", justify="left", style="")
 
@@ -76,6 +77,12 @@ def mbstatus() -> int:
                     style=style,
                 ),
                 Text(format_size(total_size)),
+                Text(
+                    # score is median speed / 1024 unless a fixed (low) value
+                    f"{format_bandwidth(server.score * 1024)}"
+                    if server.score >= 1024  # noqa: PLR2004
+                    else f"{server.score:,}"
+                ),
                 Text(f"{server.id}"),
                 Text(f"{get_geo_summary(server)}"),
             )
