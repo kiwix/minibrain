@@ -29,7 +29,7 @@ lint = [
   "ruff==0.15.15",
 ]
 check = [
-  "pyright==1.1.410",
+  "pyright==1.1.411",
   "minibrain[test]",
 ]
 test = [
