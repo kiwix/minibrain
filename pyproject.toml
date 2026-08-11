@@ -8,34 +8,26 @@ requires-python = ">=3.14,<3.15"
 description = "Simple tools to maintain Kiwix load-balancer"
 readme = "README.md"
 dependencies = [
-    "psycopg[binary]==3.3.4",
-    "peewee==4.3.0",
-    "requests==2.34.2",
-    "werkzeug==3.1.8",
-    "humanfriendly==10.0",
-    "rich==15.0.0",
-    "types-peewee==4.3.0.20260807",
-    "types-humanfriendly==10.0.1.20250319",
-    "filelock==3.32.2"
+  "psycopg[binary]==3.3.4",
+  "peewee==4.3.0",
+  "requests==2.34.2",
+  "werkzeug==3.1.8",
+  "humanfriendly==10.0",
+  "rich==15.0.0",
+  "types-peewee==4.3.0.20260807",
+  "types-humanfriendly==10.0.1.20250319",
+  "filelock==3.32.2",
+  "dnspython==2.8.0",
+  "pysocks==1.7.1",
 ]
 dynamic = ["authors", "keywords", "license", "version", "urls"]
 
 
 [project.optional-dependencies]
-scripts = [
-  "invoke==3.0.3",
-]
-lint = [
-  "ruff==0.16.2",
-]
-check = [
-  "pyright==1.1.411",
-  "minibrain[test]",
-]
-test = [
-  "pytest==9.1.1",
-  "coverage==7.15.4",
-]
+scripts = ["invoke==3.0.3"]
+lint = ["ruff==0.16.2"]
+check = ["pyright==1.1.411", "minibrain[test]"]
+test = ["pytest==9.1.1", "coverage==7.15.4"]
 dev = [
   "pre-commit==4.6.2",
   "ipython==9.16.1",
@@ -64,9 +56,7 @@ latest = "minibrain.entrypoints.latest:entrypoint"
 path = "src/minibrain/__about__.py"
 
 [tool.hatch.build]
-exclude = [
-  "/.github",
-]
+exclude = ["/.github"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/minibrain"]
@@ -117,61 +107,61 @@ src = ["src"]
 
 [tool.ruff.lint]
 select = [
-  "A",  # flake8-builtins
+  "A", # flake8-builtins
   # "ANN",  # flake8-annotations
-  "ARG",  # flake8-unused-arguments
+  "ARG", # flake8-unused-arguments
   # "ASYNC",  # flake8-async
-  "B",  # flake8-bugbear
+  "B", # flake8-bugbear
   # "BLE",  # flake8-blind-except
   "C4",  # flake8-comprehensions
-  "C90",  # mccabe
+  "C90", # mccabe
   # "COM",  # flake8-commas
   # "D",  # pydocstyle
   # "DJ",  # flake8-django
-  "DTZ",  # flake8-datetimez
-  "E",  # pycodestyle (default)
+  "DTZ", # flake8-datetimez
+  "E",   # pycodestyle (default)
   "EM",  # flake8-errmsg
   # "ERA",  # eradicate
   # "EXE",  # flake8-executable
-  "F",  # Pyflakes (default)
+  "F", # Pyflakes (default)
   # "FA",  # flake8-future-annotations
-  "FBT",  # flake8-boolean-trap
+  "FBT", # flake8-boolean-trap
   # "FLY",  # flynt
   # "G",  # flake8-logging-format
-  "I",  # isort
-  "ICN",  # flake8-import-conventions
+  "I",   # isort
+  "ICN", # flake8-import-conventions
   # "INP",  # flake8-no-pep420
   # "INT",  # flake8-gettext
-  "ISC",  # flake8-implicit-str-concat
-  "N",  # pep8-naming
+  "ISC", # flake8-implicit-str-concat
+  "N",   # pep8-naming
   # "NPY",  # NumPy-specific rules
   # "PD",  # pandas-vet
   # "PGH",  # pygrep-hooks
   # "PIE",  # flake8-pie
   # "PL",  # Pylint
-  "PLC",  # Pylint: Convention
-  "PLE",  # Pylint: Error
-  "PLR",  # Pylint: Refactor
-  "PLW",  # Pylint: Warning
+  "PLC", # Pylint: Convention
+  "PLE", # Pylint: Error
+  "PLR", # Pylint: Refactor
+  "PLW", # Pylint: Warning
   # "PT",  # flake8-pytest-style
   # "PTH",  # flake8-use-pathlib
   # "PYI",  # flake8-pyi
-  "Q",  # flake8-quotes
+  "Q", # flake8-quotes
   # "RET",  # flake8-return
   # "RSE",  # flake8-raise
-  "RUF",  # Ruff-specific rules
-  "S",  # flake8-bandit
+  "RUF", # Ruff-specific rules
+  "S",   # flake8-bandit
   # "SIM",  # flake8-simplify
   # "SLF",  # flake8-self
-  "T10",  # flake8-debugger
-  "T20",  # flake8-print
+  "T10", # flake8-debugger
+  "T20", # flake8-print
   # "TCH",  # flake8-type-checking
   # "TD",  # flake8-todos
-  "TID",  # flake8-tidy-imports
+  "TID", # flake8-tidy-imports
   # "TRY",  # tryceratops
   "UP",  # pyupgrade
-  "W",  # pycodestyle
-  "YTT",  # flake8-2020
+  "W",   # pycodestyle
+  "YTT", # flake8-2020
 ]
 ignore = [
   # Allow non-abstract empty methods in abstract base classes
@@ -181,11 +171,17 @@ ignore = [
   # Allow boolean positional values in function calls, like `dict.get(... True)`
   "FBT003",
   # Ignore checks for possible passwords
-  "S105", "S106", "S107",
+  "S105",
+  "S106",
+  "S107",
   # Ignore warnings on subprocess.run / popen
   "S603",
   # Ignore complexity
-  "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
+  "C901",
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0915",
 ]
 unfixable = [
   # Don't touch unused imports
@@ -217,21 +213,15 @@ tests = ["tests"]
 source_pkgs = ["minibrain"]
 branch = true
 parallel = true
-omit = [
-  "src/minibrain/__about__.py",
-]
+omit = ["src/minibrain/__about__.py"]
 
 [tool.coverage.report]
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
 
 [tool.pyright]
 include = ["src", "tests", "tasks.py"]
 exclude = [".env/**", ".venv/**"]
 extraPaths = ["src"]
 pythonVersion = "3.14"
-typeCheckingMode="strict"
+typeCheckingMode = "strict"
 disableBytesTypePromotions = true

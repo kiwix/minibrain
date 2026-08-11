@@ -6,6 +6,7 @@ from minibrain.__about__ import __version__
 from minibrain.context import (
     DEFAULT_ALERTS,
     DEFAULT_CONFIG_PATH,
+    DEFAULT_PROBE_IPV6,
     AlertDestination,
     Context,
 )
@@ -45,6 +46,14 @@ def prepare_context(raw_args: list[str]) -> argparse.Namespace:
         action="append",
         dest="alerts",
         default=DEFAULT_ALERTS,
+    )
+
+    parser.add_argument(
+        "--ipv6",
+        help="Also test IPv6 connectivity (requires an IP_PROXY environ)",
+        action="store_true",
+        dest="also_ipv6",
+        default=DEFAULT_PROBE_IPV6,
     )
 
     parser.add_argument(
@@ -111,6 +120,7 @@ def main() -> int:
                 dry_run=args.dry_run,
                 enable_revived=args.enable_revived,
                 alerts=[AlertDestination.parse(alert) for alert in alerts],
+                v4_only=not args.also_ipv6,
             )
         finally:
             database.close()

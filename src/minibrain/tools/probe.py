@@ -16,6 +16,7 @@ def mirrorprobe(
     *,
     dry_run: bool,
     enable_revived: bool,
+    v4_only: bool,
     alerts: list[AlertDestination],
 ) -> int:
 
@@ -42,6 +43,7 @@ def mirrorprobe(
     probe = probe_mirror(
         mirror=mirror.identifier,
         base_url=mirror.baseurl,
+        v4_only=v4_only,
         timeout=context.http_probe_timeout,
     )
 

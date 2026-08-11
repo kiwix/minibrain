@@ -27,6 +27,8 @@ DEFAULT_ALERTS: list[str] = (
 DEFAULT_DEBUG_PEEWEE: bool = bool(os.getenv("DEBUG_PEEWEE", ""))
 DEFAULT_NB_LATEST_FILES: int = int(os.getenv("NB_LATEST_FILES", "20"))
 DEFAULT_NB_MATCHING_FILES: int = int(os.getenv("NB_MATCHING_FILES", "20"))
+DEFAULT_PROBE_IPV6: bool = bool(os.getenv("PROBE_IPV6", ""))
+DEFAULT_IP6_PROXY: str = os.getenv("IP6_PROXY", "")
 
 
 @dataclass(kw_only=True)
@@ -63,6 +65,10 @@ class Context:
     slack_url: str = DEFAULT_SLACK_URL
     slack_timeout: int = DEFAULT_SLACK_TIMEOUT
     incidents_folder: Path = DEFAULT_INCIDENTS_FOLDER
+
+    # ipv6 proxy (only for probe)
+    probe_ipv6: bool = DEFAULT_PROBE_IPV6
+    ip6_proxy: str = DEFAULT_IP6_PROXY
 
     # timeouts in seconds
     http_probe_timeout: int = DEFAULT_HTTP_PROBE_TIMEOUT
@@ -194,3 +200,9 @@ class Context:
     @property
     def slack_configured(self):
         return bool(self.slack_url)
+
+    @property
+    def ip6_proxies(self) -> dict[str, str] | None:
+        if not self.ip6_proxy:
+            raise OSError("Missing IP6_PROXY environ")
+        return {"http": self.ip6_proxy, "https": self.ip6_proxy}

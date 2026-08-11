@@ -51,6 +51,7 @@ def send_mailgun_email(
     to: str,
     subject: str,
     contents: str,
+    *,
     cc: AddressList | None = None,
     bcc: AddressList | None = None,
     headers: dict[str, str] | None = None,  # noqa: ARG001
