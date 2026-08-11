@@ -9,16 +9,16 @@ description = "Simple tools to maintain Kiwix load-balancer"
 readme = "README.md"
 dependencies = [
     "psycopg[binary]==3.3.4",
-    "peewee==4.1.0",
+    "peewee==4.3.0",
     "requests==2.34.2",
     "werkzeug==3.1.8",
     "humanfriendly==10.0",
     "rich==15.0.0",
-    "types-peewee==4.0.5.20260518",
+    "types-peewee==4.3.0.20260807",
     "types-humanfriendly==10.0.1.20250319",
-    "filelock==3.29.4"
+    "filelock==3.32.2"
 ]
-dynamic = ["authors", "classifiers", "keywords", "license", "version", "urls"]
+dynamic = ["authors", "keywords", "license", "version", "urls"]
 
 
 [project.optional-dependencies]
@@ -26,19 +26,19 @@ scripts = [
   "invoke==3.0.3",
 ]
 lint = [
-  "ruff==0.15.15",
+  "ruff==0.16.2",
 ]
 check = [
   "pyright==1.1.411",
   "minibrain[test]",
 ]
 test = [
-  "pytest==9.0.3",
-  "coverage==7.14.0",
+  "pytest==9.1.1",
+  "coverage==7.15.4",
 ]
 dev = [
-  "pre-commit==4.6.0",
-  "ipython==9.13.0",
+  "pre-commit==4.6.2",
+  "ipython==9.16.1",
   "minibrain[scripts]",
   "minibrain[lint]",
   "minibrain[test]",
