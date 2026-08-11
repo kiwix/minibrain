@@ -74,7 +74,7 @@ class ProbeResponse:
     def succeeded(self) -> bool:
         return (
             self.ip4_succeeded and self.ip6_succeeded
-            if self.ip6_requested
+            if self.ip6_requested and self.ip6_declared
             else self.ip4_succeeded
         )
 
