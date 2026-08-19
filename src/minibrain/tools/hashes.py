@@ -302,7 +302,13 @@ def makehashes(
         if force:
             continue
 
-        source_info = source_file.stat(follow_symlinks=False)
+        try:
+            source_info = source_file.stat(follow_symlinks=False)
+        except FileNotFoundError:
+            logger.warning(f"Source file {source_file} is gone, ignoring")
+            source_files.remove(source_file)
+            continue
+
         target_info = target_file.stat(follow_symlinks=False)
 
         # source hasn't changed, discard this source file's ref, we wont compute
@@ -318,7 +324,11 @@ def makehashes(
     for source_file in track(source_files, description="Making hashes…"):
         relpath = source_file.relative_to(base_path)
         target_file = target_path.joinpath(relpath)
-        source_info = source_file.stat(follow_symlinks=False)
+        try:
+            source_info = source_file.stat(follow_symlinks=False)
+        except FileNotFoundError:
+            logger.warning(f"Source file {source_file} is gone, ignoring")
+            continue
         logger.info(
             f"{relpath}, {format_size(source_info.st_size)} "
             f"{format_ts(source_info.st_mtime)}"
