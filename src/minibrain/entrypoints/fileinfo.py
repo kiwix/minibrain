@@ -12,6 +12,7 @@ from rich.text import Text
 from minibrain.__about__ import __version__
 from minibrain.context import DEFAULT_CONFIG_PATH, DEFAULT_NB_MATCHING_FILES, Context
 from minibrain.utils.misc import (
+    format_dt,
     format_size,
     format_size_long,
     format_ts,
@@ -173,53 +174,49 @@ def print_search_results(
 
 def print_fileinfo(*, path: str) -> int:
 
-    from minibrain.db import Filearr, Hash, Server
-    from minibrain.utils.db import get_geo_summary, get_mirrors_summaries
+    from minibrain.utils.fileinfo import FileInfo, get_fileinfo
 
     with Status(status="Querying database…"):
-        mirrors = get_mirrors_summaries()
         try:
-            file = Filearr.get(Filearr.path == path)
-            hashes = Hash.get(Hash.file == file)
+            file: FileInfo = get_fileinfo(path=path)
         except DoesNotExist:
             logger.error(f"No file found with {path=}")
             return 1
 
-    fpath = Path(file.path)
-
     table = Table(title=f"DB results for {path} fuzzy=False")
-
     table.add_column("Meta", justify="left", style="cyan", no_wrap=True)
-    table.add_column(f"{fpath}")
+    table.add_column(f"{file.path}")
 
     mirrors_cell = Text(f"{len(file.mirrors)}")
-    for mirror_id in file.mirrors:
-        mirror = mirrors[mirror_id]
+    for mirror in file.mirrors:
+        # mirror = mirrors[mirror_id]
         style = ""
         if not mirror.enabled:
             style = "dim"
-        elif not mirror.status:
+        elif not mirror.online:
             style = "red"
         else:
             style = "green"
-        url = f"{mirror.baseurl}{path}"
         mirrors_cell.append(f"\n{mirror.ident} ", style=style)
-        mirrors_cell.append(f"({get_geo_summary(Server.get(mirror_id))})")
+        mirrors_cell.append(f"({mirror.serving})")
         mirrors_cell.append("\n")
-        mirrors_cell.append(f"{url}\n")
+        mirrors_cell.append(f"{mirror.url}\n")
 
-    table.add_row("File ID", f"{file.id}")
-    table.add_row("Filename", f"{fpath.name}")
-    table.add_row("Folder", f"{fpath.parent!s}")
-    table.add_row("Modified Time", f"{hashes.mtime} ({format_ts(hashes.mtime)})")
-    table.add_row("Size", f"{format_size_long(hashes.size)}")
+    table.add_row("File ID", f"{file.fileid}")
+    table.add_row("Filename", f"{file.filename}")
+    table.add_row("Folder", f"{file.folder}")
+    table.add_row("Modified Time", f"{file.mtime} ({format_dt(file.mtime)})")
+    table.add_row("Size", f"{format_size_long(file.size)}")
     table.add_row("Mirrors", mirrors_cell)
-    table.add_row("md5", f"{hashes.md5.hex()}")
+    table.add_row("md5", f"{file.md5}" if file.md5 else "-")
     table.add_row(
-        "sha1", f"{hashes.sha1.hex()} {format_size_long(hashes.sha1piecesize)}"
+        "sha1",
+        f"{file.sha1} {format_size_long(file.sha1_piecesize)}"
+        if file.sha1 and file.sha1_piecesize
+        else "-",
     )
-    table.add_row("sha256", f"{hashes.sha256.hex()}")
-    table.add_row("btih", f"{hashes.btih.hex()}")
+    table.add_row("sha256", f"{file.sha256}" if file.sha256 else "-")
+    table.add_row("btih", f"{file.btih}" if file.btih else "-")
 
     console = Console()
     console.print("")

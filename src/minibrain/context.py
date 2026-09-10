@@ -29,6 +29,16 @@ DEFAULT_NB_LATEST_FILES: int = int(os.getenv("NB_LATEST_FILES", "20"))
 DEFAULT_NB_MATCHING_FILES: int = int(os.getenv("NB_MATCHING_FILES", "20"))
 DEFAULT_PROBE_IPV6: bool = bool(os.getenv("PROBE_IPV6", ""))
 DEFAULT_IP6_PROXY: str = os.getenv("IP6_PROXY", "")
+DEFAULT_HTTP_SERVER_HOST: str = os.getenv("HTTP_SERVER_HOST", "0.0.0.0")  # noqa: S104
+DEFAULT_HTTP_SERVER_PORT: int = int(os.getenv("HTTP_SERVER_PORT", "5000"))
+DEFAULT_HTTP_SERVER_WORKERS: int = int(os.getenv("HTTP_SERVER_WORKERS", "1"))
+DEFAULT_HTTP_SERVER_MAX_CONCURRENCY: int | None = (
+    int(os.getenv("HTTP_SERVER_MAX_CONCURRENCY", "2"))
+    if os.getenv("HTTP_SERVER_MAX_CONCURRENCY")
+    else None
+)
+DEFAULT_HTTP_SERVER_LOG_LEVEL: str = os.getenv("HTTP_SERVER_LOG_LEVEL", "info")
+DEFAULT_HTTP_SERVER_DISABLE_LOGS: bool = bool(os.getenv("HTTP_SERVER_DISABLE_LOGS", ""))
 
 
 @dataclass(kw_only=True)
@@ -69,6 +79,14 @@ class Context:
     # ipv6 proxy (only for probe)
     probe_ipv6: bool = DEFAULT_PROBE_IPV6
     ip6_proxy: str = DEFAULT_IP6_PROXY
+
+    # http-server
+    http_server_host: str = DEFAULT_HTTP_SERVER_HOST
+    http_server_port: int = DEFAULT_HTTP_SERVER_PORT
+    http_server_workers: int = DEFAULT_HTTP_SERVER_WORKERS
+    http_server_log_level: str = DEFAULT_HTTP_SERVER_LOG_LEVEL
+    http_server_max_concurrency: int | None = DEFAULT_HTTP_SERVER_MAX_CONCURRENCY
+    http_server_disable_logs: bool = DEFAULT_HTTP_SERVER_DISABLE_LOGS
 
     # timeouts in seconds
     http_probe_timeout: int = DEFAULT_HTTP_PROBE_TIMEOUT

@@ -9,6 +9,7 @@ from minibrain.context import Context
 from minibrain.db import Server, database
 from minibrain.utils.db import get_geo_summary, get_mb_version
 from minibrain.utils.misc import format_bandwidth, format_dt, format_size
+from minibrain.utils.status import Status as LBStatus, get_status
 
 context = Context.get()
 logger = context.logger
@@ -31,6 +32,9 @@ def mbstatus() -> int:
     logger.info(f"Starting status for {context.dsn}")
     logger.warning(f"Connected to mirrorbrain DB version {get_mb_version()}")
 
+    with Status(status="Querying database…"):
+        status: LBStatus = get_status()
+
     table = Table(title="Minibrain Status")
 
     table.add_column("Mirror", justify="left", style="cyan", no_wrap=True)
@@ -42,50 +46,33 @@ def mbstatus() -> int:
     table.add_column("ID", justify="right", style="")
     table.add_column("Serving", justify="left", style="")
 
-    with Status(status="Querying database…"):
-        for server in Server.select().order_by(
-            Server.enabled.desc(), Server.identifier.asc()
-        ):
-            nb_files: int = get_single_int(
-                database, "SELECT mirr_get_nfiles(%s);", (server.id,)
-            )
 
-            total_size: int = (
-                get_single_int(
-                    database,
-                    "SELECT SUM(hash.size) as total FROM hash "
-                    "INNER JOIN filearr ON filearr.id = hash.file_id "
-                    "WHERE %s = ANY(filearr.mirrors);",
-                    (server.id,),
-                )
-                or 0
-            )
-
-            style = "dim" if not server.enabled else ""
-            table.add_row(
-                Text(f"{server.identifier}", style=style),
-                Text("DISABLED", style=style)
-                if not server.enabled
-                else (
-                    Text("ONLINE", style="green")
-                    if server.status_baseurl
-                    else Text("OFFLINE", style="red")
-                ),
-                Text(f"{nb_files:,}", style=style),
-                Text(
-                    f"{format_dt(server.last_scan) if server.last_scan else 'n/a'}",
-                    style=style,
-                ),
-                Text(format_size(total_size)),
-                Text(
-                    # score is median speed / 1024 unless a fixed (low) value
-                    f"{format_bandwidth(server.score * 1024)}"
-                    if server.score >= 1024  # noqa: PLR2004
-                    else f"{server.score:,}"
-                ),
-                Text(f"{server.id}"),
-                Text(f"{get_geo_summary(server)}"),
-            )
+    for server in status.mirrors:
+        style = "dim" if not server.enabled else ""
+        table.add_row(
+            Text(f"{server.ident}", style=style),
+            Text("DISABLED", style=style)
+            if not server.enabled
+            else (
+                Text("ONLINE", style="green")
+                if server.online
+                else Text("OFFLINE", style="red")
+            ),
+            Text(f"{server.nb_files:,}", style=style),
+            Text(
+                f"{format_dt(server.last_scan_on) if server.last_scan_on else 'n/a'}",
+                style=style,
+            ),
+            Text(format_size(server.total_size)),
+            Text(
+                # score is median speed / 1024 unless a fixed (low) value
+                f"{format_bandwidth(server.score * 1024)}"
+                if server.score >= 1024  # noqa: PLR2004
+                else f"{server.score:,}"
+            ),
+            Text(f"{server.dbid}"),
+            Text(f"{server.serving}"),
+        )
 
     console = Console()
     console.print("")
