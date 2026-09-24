@@ -216,7 +216,7 @@ def mirrorscan(
 
     if not mirror.enabled and scan.nb_scanned > 0 and enable:
         logger.info("ENABLING mirror {mirror.identifier} after successful scan")
-        mirror.enable = True
+        mirror.enabled = True
 
     mirror.last_scan = datetime.datetime.now(tz=datetime.UTC)
     mirror.scan_fpm = scan.files_per_mn

@@ -35,6 +35,7 @@ class BaseModel(Model):
 
 
 class Country(BaseModel):
+    id: int
     code = CharField()
     name = CharField()
 
@@ -43,6 +44,7 @@ class Country(BaseModel):
 
 
 class Filearr(BaseModel):
+    id: int
     path = CharField(unique=True)
     mirrors = ArrayField(field_class=SmallIntegerField, null=True)
 
@@ -51,6 +53,7 @@ class Filearr(BaseModel):
 
 
 class Hash(BaseModel):
+    file_id: int
     file = ForeignKeyField(
         column_name="file_id", field="id", model=Filearr, primary_key=True
     )
@@ -72,6 +75,7 @@ class Hash(BaseModel):
 
 
 class Marker(BaseModel):
+    id: int
     subtree_name = CharField()
     markers = CharField()
 
@@ -80,6 +84,7 @@ class Marker(BaseModel):
 
 
 class Region(BaseModel):
+    id: int
     code = CharField()
     name = CharField()
 
@@ -88,6 +93,7 @@ class Region(BaseModel):
 
 
 class Server(BaseModel):
+    id: int
     identifier = CharField(unique=True)
     baseurl = CharField()
     baseurl_ftp = CharField()
@@ -123,6 +129,7 @@ class Server(BaseModel):
 
 
 class Version(BaseModel):
+    id: int
     component = TextField()
     major = IntegerField()
     minor = IntegerField()

@@ -39,8 +39,8 @@ def get_fileinfo(*, path: str) -> FileInfo:
 
     all_mirrors = get_mirrors_summaries()
     try:
-        file = Filearr.get(Filearr.path == path)
-        hashes = Hash.get(Hash.file == file)
+        file: Filearr = Filearr.get(Filearr.path == path)  # type: ignore
+        hashes: Hash = Hash.get(Hash.file == file)  # type: ignore
     except DoesNotExist:
         logger.error(f"No file found with {path=}")
         raise
@@ -53,7 +53,7 @@ def get_fileinfo(*, path: str) -> FileInfo:
         mirrors.append(
             MirrorEntry(
                 ident=mirror.ident,
-                serving=get_geo_summary(Server.get(mirror_id)),
+                serving=get_geo_summary(Server.get(mirror_id)),  # type: ignore
                 url=f"{mirror.baseurl}{path}",
                 enabled=mirror.enabled,
                 online=mirror.status,
@@ -65,7 +65,7 @@ def get_fileinfo(*, path: str) -> FileInfo:
         path=str(fpath),
         filename=fpath.name,
         folder=str(fpath.parent),
-        mtime=hashes.mtime,
+        mtime=datetime.datetime.fromtimestamp(hashes.mtime, tz=datetime.UTC),
         size=hashes.size,
         md5=hashes.md5.hex() if hashes.md5 else None,
         sha1=hashes.sha1.hex() if hashes.sha1 else None,
@@ -73,5 +73,4 @@ def get_fileinfo(*, path: str) -> FileInfo:
         sha256=hashes.sha256.hex() if hashes.sha256 else None,
         btih=hashes.btih.hex() if hashes.btih else None,
         mirrors=mirrors,
-        nb_mirrors=len(mirrors),
     )

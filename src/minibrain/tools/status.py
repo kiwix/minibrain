@@ -6,10 +6,10 @@ from rich.table import Table
 from rich.text import Text
 
 from minibrain.context import Context
-from minibrain.db import Server, database
-from minibrain.utils.db import get_geo_summary, get_mb_version
+from minibrain.utils.db import get_mb_version
 from minibrain.utils.misc import format_bandwidth, format_dt, format_size
-from minibrain.utils.status import Status as LBStatus, get_status
+from minibrain.utils.status import Status as LBStatus
+from minibrain.utils.status import get_status
 
 context = Context.get()
 logger = context.logger
@@ -45,7 +45,6 @@ def mbstatus() -> int:
     table.add_column("Score/speed", justify="left", style="")
     table.add_column("ID", justify="right", style="")
     table.add_column("Serving", justify="left", style="")
-
 
     for server in status.mirrors:
         style = "dim" if not server.enabled else ""
