@@ -1,13 +1,13 @@
 from http import HTTPStatus
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import RedirectResponse
+from fastapi.responses import PlainTextResponse, RedirectResponse
 from peewee import DoesNotExist
 
 from minibrain.context import Context
 from minibrain.utils.fileinfo import FileInfo, get_fileinfo
 from minibrain.utils.status import Status, get_status
-from minibrain.utils.wellknown import get_most_mirrored
+from minibrain.utils.wellknown import get_all_btihs, get_most_mirrored
 
 context = Context.get()
 logger = context.logger
@@ -39,3 +39,9 @@ def entry(path: str) -> FileInfo:
 @app.get("/well-known/most-mirrored.json")
 def most_mirrored_zims() -> list[FileInfo]:
     return get_most_mirrored(nb_results=2)
+
+
+@app.get("/well-known/btihs.txt")
+def all_btihs() -> PlainTextResponse:
+    """List of all info hashes in the database (one per line)"""
+    return PlainTextResponse(get_all_btihs())

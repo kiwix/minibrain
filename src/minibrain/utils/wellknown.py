@@ -16,3 +16,9 @@ def get_most_mirrored(nb_results: int) -> list[FileInfo]:
             (nb_results,),
         )
     ]
+
+
+def get_all_btihs() -> str:
+    return "\n".join(
+        [row[0] for row in database.execute_sql("SELECT btihhex from hexhash;", ())]  # type: ignore
+    )
