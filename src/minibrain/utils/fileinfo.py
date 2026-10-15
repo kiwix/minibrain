@@ -48,7 +48,7 @@ def get_fileinfo(*, path: str) -> FileInfo:
     fpath = Path(file.path)
 
     mirrors: list[MirrorEntry] = []
-    for mirror_id in file.mirrors:
+    for mirror_id in file.mirror_ids:
         mirror = all_mirrors[mirror_id]
         mirrors.append(
             MirrorEntry(

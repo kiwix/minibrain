@@ -101,12 +101,14 @@ def print_latest_files(*, nb_files: int) -> int:
     with Status(status="Querying database…"):
         mirrors = get_mirrors_summaries()
         for file in Filearr.select().order_by(Filearr.id.desc()).limit(nb_files):  # pyright: ignore[reportAttributeAccessIssue]
-            nbm = len(file.mirrors)
-            nbm_disabled = len([1 for mid in file.mirrors if not mirrors[mid].enabled])
+            nbm = len(file.mirror_ids)
+            nbm_disabled = len(
+                [1 for mid in file.mirror_ids if not mirrors[mid].enabled]
+            )
             nbm_online = len(
                 [
                     1
-                    for mid in file.mirrors
+                    for mid in file.mirror_ids
                     if mirrors[mid].status and mirrors[mid].enabled
                 ]
             )

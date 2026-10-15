@@ -48,6 +48,11 @@ class Filearr(BaseModel):
     path = CharField(unique=True)
     mirrors = ArrayField(field_class=SmallIntegerField, null=True)
 
+    @property
+    def mirror_ids(self) -> list[int]:
+        """non-null list of mirrors IDs"""
+        return self.mirrors or []
+
     class Meta:
         table_name = "filearr"
 
