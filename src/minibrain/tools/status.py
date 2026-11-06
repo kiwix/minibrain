@@ -42,6 +42,7 @@ def mbstatus() -> int:
     table.add_column("Nb. files", justify="right", style="green")
     table.add_column("Last scan", justify="right", style="")
     table.add_column("Size", justify="right", style="")
+    table.add_column("Location", justify="left", style="")
     table.add_column("Score/speed", justify="left", style="")
     table.add_column("ID", justify="right", style="")
     table.add_column("Serving", justify="left", style="")
@@ -63,6 +64,7 @@ def mbstatus() -> int:
                 style=style,
             ),
             Text(format_size(server.total_size)),
+            Text(f"{server.conf.country.upper()} ({server.conf.region.upper()})"),
             Text(
                 # score is median speed / 1024 unless a fixed (low) value
                 f"{format_bandwidth(server.score * 1024)}"
