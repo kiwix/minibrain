@@ -9,7 +9,7 @@ from pathlib import Path
 
 from rich.logging import RichHandler
 
-PATTERN = re.compile(r"^(?P<ident>.+)_(?P<date>\d{4}-\d{2}).zim$")
+PATTERN = re.compile(r"^(?P<ident>.+)_(?P<date>\d{4}-\d{2}[a-z]{0,2}).zim$")
 
 logging.basicConfig(
     level=logging.INFO, format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
