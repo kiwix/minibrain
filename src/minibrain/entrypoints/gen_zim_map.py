@@ -9,7 +9,7 @@ from pathlib import Path
 
 from rich.logging import RichHandler
 
-PATTERN = re.compile(r"^(?P<ident>.+)_(?P<date>\d{4}-\d{2}).zim$")
+PATTERN = re.compile(r"^(?P<ident>.+)_(?P<date>\d{4}-\d{2}[a-z]{0,2})\.zim$")
 
 logging.basicConfig(
     level=logging.INFO, format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
@@ -22,22 +22,20 @@ def run(root: Path, map_path: Path, prefix: str, *, dry_run: bool) -> int:
         f"Creating ZIM redirects map from {root!s} to {map_path!s} with {dry_run=}"
     )
 
-    # build sorted list of all files
-    zim_files: list[Path] = sorted(
-        {
-            path.relative_to(root)
+    # build list of (ident, date, path) sorted on filename parts only (folder ignored)
+    zim_files: list[tuple[str, str, Path]] = sorted(
+        (
+            (match.group("ident"), match.group("date"), path.relative_to(root))
             for path in root.rglob("*")
-            if path.is_file() and PATTERN.match(path.name)
-        },
+            if path.is_file() and (match := PATTERN.match(path.name))
+        ),
         reverse=True,
     )
 
-    # create the map using ident and first found version (sorted means first is last)
+    # create the map using ident and first found version
     zim_map: dict[str, str] = {}
-    for path in zim_files:
-        ident = path.stem.rsplit("_", 1)[0]
-        if ident not in zim_map:
-            zim_map[ident] = str(path)
+    for ident, _, path in zim_files:
+        zim_map.setdefault(ident, str(path))
 
     logger.debug(f"> {len(zim_map):,} entries in map.")
 
